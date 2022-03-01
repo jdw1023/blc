@@ -1,0 +1,3 @@
+var x: Int = 36;
+var y: Int = 7;
+print(x+y==43);
