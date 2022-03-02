@@ -17,12 +17,12 @@ class BaseLexer(
         get() = start until current
 
     private val text: String
-        get() = source.substring(range) 
+        get() = source.substring(range)
 
     private val peek: Char
         get() = when {
-            isAtEnd -> '\u0000' // EOF
-            else -> source[current] // peek is the current character
+            isAtEnd -> '\u0000'
+            else -> source[current]
         }
 
     private var inString = false
@@ -154,7 +154,6 @@ class BaseLexer(
         return source[current - 1]
     }
 
-    
     private fun match(expected: Char): Boolean = when {
         isAtEnd -> false
         source[current] != expected -> false
