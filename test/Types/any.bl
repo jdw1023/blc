@@ -1,0 +1,33 @@
+//Tests if any can be a string
+
+var x: Any = "hello";
+print(x);
+
+var x1: Any = " ";
+print(x1);
+
+//Tests if any can be an int
+
+var y: Any = 1;
+print(y);
+
+var y1: Any = -1;
+print(y1);
+
+//Tests if any can be a boolean
+
+var z: Any = true;
+print(z);
+var z1: Any = false;
+print(z1);
+
+//Tests if an any variable can change type
+
+z = "hi";
+print(z);
+
+y = true;
+print(y);
+
+x = 100;
+print(x);
