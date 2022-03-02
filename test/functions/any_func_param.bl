@@ -1,0 +1,6 @@
+fun any(a: Any) -> Int { // FIXME: currently gives a unknown identifier a error
+    print(a);
+    return 1;
+}
+
+print(any("Hello"));
