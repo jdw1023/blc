@@ -1,3 +1,26 @@
+//Tests If statement
+
 if (5>4){
 	print("true");
+}
+
+//Tests if statement with variables
+
+var x: Int = 1;
+var y: Int = 2;
+
+if(x<y){
+    print("true");
+}
+
+//Tests if statement when condition is false
+
+if(4>5){
+    print("false");
+}
+
+//Tests if statement when condition is false with variables
+
+if(x>y){
+    print("false");
 }
