@@ -31,3 +31,6 @@ print(y);
 
 x = 100;
 print(x);
+
+x = unit;
+print(x);
