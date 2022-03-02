@@ -1,0 +1,15 @@
+print("Checking not")
+print("These should be true: ")
+print(true)
+print(!false)
+print(!!true)
+var a : Bool = true;
+var b : Bool = false;
+print(!b)
+print(a)
+
+print("These should be false: ")
+print(!!false)
+print(!true)
+print(false)
+
