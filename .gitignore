@@ -38,3 +38,6 @@
 
 # Intelllij Maven
 .idea/**/gradle.xml
+
+# test build
+test/*.jar

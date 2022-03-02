@@ -1,4 +1,0 @@
-var i : Int = 998;
-var x : Any = 3;
-x=998;
-print(x);
