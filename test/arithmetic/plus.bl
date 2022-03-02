@@ -1,3 +1,15 @@
+print("Checking add");
+print("These should be true: ");
 var x: Int = 36;
 var y: Int = 7;
 print(x+y==43);
+print(x+3==39);
+print(3+x==39);
+print(3+-3==0);
+print(-9+-3==-12);
+
+print("These should be false: ");
+print(x+y==40);
+print(x+3==22);
+print(3+x==12);
+print(3+-9==12);
