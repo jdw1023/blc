@@ -1,0 +1,23 @@
+struct Person { age: Int, name: String }
+
+fun find_name( aName: String, list: [Person], len: Int ) -> Person{
+    var i: Int = len-1;
+    while( i >= 0 ){
+        if( list[i].name == aName) return list[i];
+        i = i - 1;
+    }
+}
+
+var p1:Person = Person(45, "Joe");
+var p2:Person = Person(21, "Blane");
+var p3:Person = Person(35, "Bethany");
+
+var trifecta:[Person] = [ p1, p2, p3 ]
+
+var s1:Person = find_name("Joe", trifecta, 3);
+var s2:Person = find_name("Blane", trifecta, 3);
+var s3:Person = find_name("Bethany", trifecta, 3);
+
+print( s1==p1 );
+print( s2==p2 );
+print( s3==p3 );
