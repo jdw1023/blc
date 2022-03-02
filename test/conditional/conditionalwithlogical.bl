@@ -1,0 +1,12 @@
+//Tests a conditional if statement using an Int && bool
+//Should output true
+
+
+var x: Int = 10;
+var t: Bool = true;
+
+if(x==10 && !t){
+    print(true);
+}else{
+    print(!t)
+}
