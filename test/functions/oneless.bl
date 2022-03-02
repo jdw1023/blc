@@ -10,3 +10,16 @@ fun oneless(x: Int)->Unit{
 oneless(1);
 oneless(2);
 oneless(3);
+
+//Tests function call with a return of type int. Outputs should be..
+//-1
+//0
+//1
+
+fun twoless(x: Int)->Int{
+    return (x-2);
+}
+
+twoless(1);
+twoless(2);
+twoless(3);
