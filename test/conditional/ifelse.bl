@@ -1,8 +1,12 @@
+//Tests when if fails
+
 if(2>10){
 print("false");
 }else{
 print("true");
 }
+
+//Tests when if is correct... else should not print
 
 if(6>3){
 print("true");

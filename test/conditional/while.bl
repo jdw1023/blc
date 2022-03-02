@@ -1,8 +1,13 @@
+
+//Tests when the condition is never met... Should only pass through once
+
 var x: Int = 0;
 while(x<10){
 print("no loop");
 x=11;
 }
+
+//Tests while statement should count down from 10-1
 
 var y: Int =10;
 while(y>0){
