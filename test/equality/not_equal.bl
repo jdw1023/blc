@@ -1,0 +1,14 @@
+print("Checking not equals")
+print("These should be true: ")
+print(1!=2)
+print(2!=1)
+print(1!=-1)
+print(-99!=99)
+
+print("These should be false: ")
+print(0!=0)
+print(3!=3)
+print(-2!=-2)
+print(-1!=-1)
+print(99!=99)
+
