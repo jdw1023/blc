@@ -1,0 +1,15 @@
+fun any_int() -> Any{
+    return 1;
+}
+
+fun any_string() -> Any{
+    var s: String = "Hello0";
+    return s;
+}
+
+fun any_string1() -> Any{
+    return "Hello1";
+}
+print(any_int());
+print(any_string());
+print(any_string1());
