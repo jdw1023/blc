@@ -1,0 +1,12 @@
+//Tests function call output should be...
+//0
+//1
+//2
+
+fun oneless(x: Int)->Unit{
+    print(x-1);
+}
+
+oneless(1);
+oneless(2);
+oneless(3);
