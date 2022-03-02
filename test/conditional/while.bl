@@ -1,0 +1,12 @@
+var x: Int = 0;
+while(x<10){
+print("no loop");
+x=11;
+}
+
+var y: Int =10;
+while(y>0){
+print(y);
+y=y-1;
+}
+

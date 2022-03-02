@@ -1,0 +1,12 @@
+if(2>10){
+print("false");
+}else{
+print("true");
+}
+
+if(6>3){
+print("true");
+}else{
+print("false");
+}
+
