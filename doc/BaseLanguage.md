@@ -1,9 +1,19 @@
 # Base Language
 
+Base Language is a subset of the Kotlin lanuage that our group is developing for our CISC471 class.
+As such, it is experimental, and many features are broken or partially broken.
+
+## Broken Aspects
+
+* The addition operator returns a SyntaxError, even when the statement is syntactically correct
+* The multiplication operator performs the modulo operator, not multiplication
+* User-Defined functions are unable to accept parameters
+
+
 ## Types
 
 * `Boolean`
-* `Int`
+* `Int` - Any 64-bit Integer
 * `String`
 * `Unit` - indicates the absence of a value. unit is the only value of type Unit
 
