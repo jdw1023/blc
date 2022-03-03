@@ -5,6 +5,18 @@ import edu.udel.blc.util.visitor.ValuedVisitor
 
 class Optimizer : ValuedVisitor<Node, Node>() {
 
+    /**
+        TODO:
+         * Constant Folding
+         * Strength Reduction
+         * Deadcode Elimination
+
+        Use ValuedVisitor to walk tree and return new AST node tree
+
+        Make O0 extension of Optimizer class
+    */
+
+
 //    init {
 //        register(FunctionDeclarationNode::class.java, ::functionDeclaration)
 //        register(VariableDeclarationNode::class.java, ::variableDeclaration)

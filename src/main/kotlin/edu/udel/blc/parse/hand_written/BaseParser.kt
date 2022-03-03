@@ -13,8 +13,10 @@ class BaseParser(
 
     constructor(lexer: BaseLexer) : this(lexer.tokens())
 
+    // current token being processed, BaseToken Class
     private var currentToken: BaseToken = tokens.next()
 
+    // Does the progression through tokens
     private fun advance(): BaseToken {
         val previousToken = currentToken
         if (!isAtEnd) {
@@ -26,6 +28,7 @@ class BaseParser(
     private val isAtEnd: Boolean
         get() = currentToken.kind == EOF
 
+    // Start of the parsing function
     fun compilationUnit(): CompilationUnitNode {
         return CompilationUnitNode(0..0, declarations())
     }
@@ -36,6 +39,9 @@ class BaseParser(
         }
     }
 
+    // Grammar is encoded within the production rules listed here
+    // Production rules are functions that return Node objects
+    // Productions START
     fun declaration(): StatementNode {
         return when {
             check(FUN) -> functionDeclaration()
@@ -252,7 +258,7 @@ class BaseParser(
                     BinaryExpressionNode(operator.range, SUBTRACTION, expr, right)
                 }
                 check(PLUS) -> {
-                    val operator = consume(MINUS) { "Expect '+'." }
+                    val operator = consume(MINUS) { "Expect '+'." } // TODO: Change token from MINUS to PLUS
                     val right = factor()
                     BinaryExpressionNode(operator.range, ADDITION, expr, right)
                 }
@@ -405,7 +411,11 @@ class BaseParser(
         consume(RBRACKET) { "Expect ']' after array type." }
         return ArrayTypeNode(lbrace.range, elementType)
     }
+    // Productions END
 
+    /********************
+     * HELPER FUNCTIONS *
+     ********************/
     fun <T> list(kind: BaseToken.Kind, element: () -> T): List<T> = buildList {
         if (!check(kind)) {
             do {
@@ -417,6 +427,7 @@ class BaseParser(
         }
     }
 
+    // Check wrapper function
     private fun match(vararg kinds: BaseToken.Kind): Boolean {
         if (check(*kinds)) {
             advance()
@@ -425,6 +436,7 @@ class BaseParser(
         return false
     }
 
+    // Consumes a certain kind of token, and if it fails returns and error of what it expected
     private fun consume(vararg kinds: BaseToken.Kind, lazyMessage: () -> String): BaseToken {
         when {
             check(*kinds) -> return advance()
@@ -432,6 +444,7 @@ class BaseParser(
         }
     }
 
+    // Checks if the current token has the given kind
     private fun check(vararg kinds: BaseToken.Kind): Boolean {
         return !isAtEnd && kinds.any { currentToken.kind == it }
     }
