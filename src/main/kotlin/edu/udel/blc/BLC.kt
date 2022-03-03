@@ -70,6 +70,9 @@ class BLC : CliktCommand() {
             }
 
             val symboltable = SemanticAnalysis.apply(compilationUnit).bind()
+
+            // TODO: Add Optimizer code here w/ command flag
+
             target.apply(symboltable, compilationUnit).bind()
         }
 
