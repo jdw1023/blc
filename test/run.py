@@ -1,5 +1,6 @@
 import glob
 from subprocess import PIPE, run, STDOUT
+from sys import argv
 
 # https://stackoverflow.com/questions/287871/how-to-print-colored-text-to-the-terminal 
 class bcolors:
@@ -15,7 +16,7 @@ class bcolors:
 
 
 # TODO: better testing using some framework (junit?)
-OPTIONS = '' # add blc options here
+OPTIONS = ' '.join(argv[1:]) if len(argv) >1 else '' # add blc options here
 COLOR = True
 for filename in glob.iglob('**/*.bl', root_dir='test', recursive=True):
      print(f'./build/install/blc/bin/blc {OPTIONS} {filename}')

@@ -1,0 +1,4 @@
+var z: Any = true;
+print(z);
+z= 5;
+print(z);
