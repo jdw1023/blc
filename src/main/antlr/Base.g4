@@ -38,12 +38,12 @@ stmt
     | WHILE LPAREN condition=expr RPAREN body=stmt                                       # whileStmt
     ;
 
-# Example_production_rule
+// Example production rule
 block
     : LBRACKET ( declarations+=declaration )* RBRACKET
     ;
 
-# Has_Left_recursion_mitigation
+// Has Left recursion mitigation
 expr
     : <assoc=right> lvalue=expr EQUAL expression=expr                                    # assignment
     | left=expr DISJ right=expr                                                          # binary
@@ -83,7 +83,7 @@ fragment LETTER
     : [a-zA-Z]
     ;
 
-# Start_token_definitions
+// Start token definitions
 LPAREN: '(';
 RPAREN: ')';
 
@@ -130,7 +130,7 @@ FALSE: 'false';
 
 UNIT: 'unit';
 
-# End_token_definitions
+// End token definitions
 
 
 IDENTIFIER
