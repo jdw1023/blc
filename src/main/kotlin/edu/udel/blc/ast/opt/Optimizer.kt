@@ -65,8 +65,28 @@ class Optimizer : ValuedVisitor<Node, Node>() {
                 return node
         }
 
-        private fun unaryExpression(node: UnaryExpressionNode): Node {
-                return node
+        private fun unaryExpression(node: UnaryExpressionNode): Node { //
+                val opr = node.operator
+                val opd = this.apply(node.operand) // resolve operand
+
+                val newNode = when { // TODO: code refactoring
+                        ( opd is IntLiteralNode && opr == UnaryOperator.NEGATION ) -> {
+                                LOG.info("(Constant folding) ${opr} ${opd.value} ");
+                                IntLiteralNode(node.range, -opd.value)
+                        }
+                        ( opd is BooleanLiteralNode ) -> {
+                                when (opr) {
+                                        (UnaryOperator.LOGICAL_COMPLEMENT)->{
+                                                LOG.info("(Constant folding) ${opr} ${opd.value} ");
+                                                BooleanLiteralNode(node.range, !opd.value)
+                                        }
+                                        else -> { node }
+                                }
+
+                        }
+                        else -> { node }
+                };
+                return newNode
         }
 
         private fun stringLiteral(node: StringLiteralNode): Node {
