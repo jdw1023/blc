@@ -178,7 +178,9 @@ class Optimizer : ValuedVisitor<Node, Node>() {
         }
 
         private fun `if`(node: IfNode): Node {
-                return node
+                val newcondition = this.apply(node.condition) as ExpressionNode
+                //val newstatements
+                return IfNode(node.range, newcondition, node.thenStatement, node.elseStatement)
         }
 
         private fun expressionStatement(node: ExpressionStatementNode): Node {
