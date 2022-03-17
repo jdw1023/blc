@@ -114,36 +114,9 @@ class Optimizer : ValuedVisitor<Node, Node>() {
                 val l = this.apply(node.left)
                 val r = this.apply(node.right)
                 val newNode = when {
-                        //(l is IntLiteralNode && r is IntLiteralNode) -> {
-                        (l is IntLiteralNode && r is IntLiteralNode) -> {
-                                LOG.info("(Constant folding) ${l.value} ${node.operator} ${r.value} ");
-                                when (node.operator) {  // TODO: figure out what's the range, range chr in source?
-                                        BinaryOperator.ADDITION -> IntLiteralNode(node.range ,l.value + r.value);
-                                        BinaryOperator.SUBTRACTION -> IntLiteralNode(node.range ,l.value - r.value);
-                                        BinaryOperator.MULTIPLICATION -> IntLiteralNode(node.range ,l.value * r.value);
-                                        BinaryOperator.REMAINDER -> IntLiteralNode(node.range ,l.value % r.value); // what's the operation for division?
-
-                                        BinaryOperator.EQUAL_TO -> BooleanLiteralNode(node.range ,l.value == r.value); // what's the operation for division?
-                                        BinaryOperator.NOT_EQUAL_TO -> BooleanLiteralNode(node.range, l.value != r.value)
-                                        BinaryOperator.GREATER_THAN -> BooleanLiteralNode(node.range, l.value > r.value)
-                                        BinaryOperator.GREATER_THAN_OR_EQUAL_TO -> BooleanLiteralNode(node.range, l.value >= r.value)
-                                        BinaryOperator.LESS_THAN -> BooleanLiteralNode(node.range, l.value < r.value)
-                                        BinaryOperator.LESS_THAN_OR_EQUAL_TO -> BooleanLiteralNode(node.range, l.value <= r.value)
-                                        else -> node
-                                }
-                        }
-                        (l is BooleanLiteralNode  && r is BooleanLiteralNode ) -> { // TODO: code refactoring
-                                LOG.info("(Constant folding) ${l.value} ${node.operator} ${r.value} ");
-                                when (node.operator) {
-                                        BinaryOperator.EQUAL_TO -> BooleanLiteralNode(node.range ,l.value == r.value); // what's the operation for division?
-                                        BinaryOperator.NOT_EQUAL_TO -> BooleanLiteralNode(node.range, l.value != r.value)
-                                        BinaryOperator.GREATER_THAN -> BooleanLiteralNode(node.range, l.value > r.value)
-                                        BinaryOperator.GREATER_THAN_OR_EQUAL_TO -> BooleanLiteralNode(node.range, l.value >= r.value)
-                                        BinaryOperator.LESS_THAN -> BooleanLiteralNode(node.range, l.value < r.value)
-                                        BinaryOperator.LESS_THAN_OR_EQUAL_TO -> BooleanLiteralNode(node.range, l.value <= r.value)
-                                        else -> node
-                                }
-                        }
+                        //(l is IntLiteralNode && r is IntLiteralNode) -> 
+                        (l is IntLiteralNode && r is IntLiteralNode) -> constFoldBinExpressInt(node,l,r);
+                        (l is BooleanLiteralNode && r is BooleanLiteralNode ) -> constFoldBinExpressBool(node,l,r);
                         else -> { node }
                 };
                 return newNode
@@ -199,4 +172,40 @@ class Optimizer : ValuedVisitor<Node, Node>() {
                 return node
         }
 
+	/********************
+	 * Helper functions *
+	 *******************/
+	
+	private fun constFoldBinExpressInt(node: BinaryExpressionNode, l: IntLiteralNode, r: IntLiteralNode) : Node {
+                LOG.info("(Constant folding) ${l.value} ${node.operator} ${r.value} ");
+                val newNode = when (node.operator) {  // TODO: figure out what's the range, range chr in source?
+                        BinaryOperator.ADDITION -> IntLiteralNode(node.range ,l.value + r.value);
+                        BinaryOperator.SUBTRACTION -> IntLiteralNode(node.range ,l.value - r.value);
+                        BinaryOperator.MULTIPLICATION -> IntLiteralNode(node.range ,l.value * r.value);
+                        BinaryOperator.REMAINDER -> IntLiteralNode(node.range ,l.value % r.value); // what's the operation for division?
+
+                        BinaryOperator.EQUAL_TO -> BooleanLiteralNode(node.range ,l.value == r.value); // what's the operation for division?
+                        BinaryOperator.NOT_EQUAL_TO -> BooleanLiteralNode(node.range, l.value != r.value)
+                        BinaryOperator.GREATER_THAN -> BooleanLiteralNode(node.range, l.value > r.value)
+                        BinaryOperator.GREATER_THAN_OR_EQUAL_TO -> BooleanLiteralNode(node.range, l.value >= r.value)
+                        BinaryOperator.LESS_THAN -> BooleanLiteralNode(node.range, l.value < r.value)
+                        BinaryOperator.LESS_THAN_OR_EQUAL_TO -> BooleanLiteralNode(node.range, l.value <= r.value)
+                        else -> node
+                }
+		return newNode
+	}
+
+	private fun constFoldBinExpressBool(node: BinaryExpressionNode, l: BooleanLiteralNode, r:BooleanLiteralNode) : Node {
+                LOG.info("(Constant folding) ${l.value} ${node.operator} ${r.value} ");
+                val newNode = when (node.operator) {
+                        BinaryOperator.EQUAL_TO -> BooleanLiteralNode(node.range ,l.value == r.value);
+                        BinaryOperator.NOT_EQUAL_TO -> BooleanLiteralNode(node.range, l.value != r.value)
+                        BinaryOperator.GREATER_THAN -> BooleanLiteralNode(node.range, l.value > r.value)
+                        BinaryOperator.GREATER_THAN_OR_EQUAL_TO -> BooleanLiteralNode(node.range, l.value >= r.value)
+                        BinaryOperator.LESS_THAN -> BooleanLiteralNode(node.range, l.value < r.value)
+                        BinaryOperator.LESS_THAN_OR_EQUAL_TO -> BooleanLiteralNode(node.range, l.value <= r.value)
+                        else -> node
+                }
+		return newNode
+	}
 }
