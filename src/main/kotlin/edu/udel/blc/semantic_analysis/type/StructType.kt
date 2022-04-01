@@ -7,7 +7,7 @@ class StructType(
 
     override fun toString(): String = buildString {
         append(name)
-        fieldTypes.entries.joinTo(this, prefix = "{", postfix = "}") { (name, type) -> "$name : $type"}
+        fieldTypes.entries.joinTo(this, prefix = "{", postfix = "}") { (name, type) -> "$name : $type" }
     }
 
 }

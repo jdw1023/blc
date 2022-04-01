@@ -9,7 +9,7 @@ sealed interface Type {
         val result = when {
             this == other -> true
             other is AnyType -> true
-            this is ArrayType && other is ArrayType -> this.elementType isAssignableTo  other.elementType
+            this is ArrayType && other is ArrayType -> this.elementType isAssignableTo other.elementType
             else -> false
         }
         return result

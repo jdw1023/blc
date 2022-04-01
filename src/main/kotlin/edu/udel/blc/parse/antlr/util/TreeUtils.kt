@@ -28,7 +28,7 @@ object TreeUtils {
     }
 
     fun Tree.children(): List<Tree> = buildList {
-        for(i in 0 until childCount) {
+        for (i in 0 until childCount) {
             add(getChild(i))
         }
     }

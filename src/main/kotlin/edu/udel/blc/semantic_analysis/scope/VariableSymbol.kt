@@ -12,6 +12,5 @@ class VariableSymbol(
         get() = containingScope is CallableSymbol
 
 
-
 }
 
