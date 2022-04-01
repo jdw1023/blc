@@ -19,3 +19,42 @@ At a minimum your proposal for each extension must provide:
 4) A description of how you will judge the success of the extension.
 
 Finally, you should propose a timeline for implementing the proposed extensions.
+
+
+---
+
+# Minor Proposal:
+
+shift operator (>> and <<)
+
+## Abstract
+* Implement bitwise left and right shift operator << and >> in the blc language.
+
+## Rationale/Justification
+* The developer and user can benefit from the shift operator and the optimized performence.
+* The bitwise shift operators is a important operation due to it's speed. For example, we can use the shift operator in our optimizer to optimize the modulus/remainder operator and the division (see the next proposal).
+* The shift operators is also commonly used in Cryptography. For example, the AES (Advanced Encyption Standard) uses the ShiftRows step.
+
+## Syntax/How it work
+```
+2 << 3 // 16
+2 >> 3 // 0
+5 << 4 // 80
+128 >> 3 // 16
+```
+* The shift operator will operate in a similar way compare the the shift operator in Python and C.
+* It will be a BinaryOperation.
+* ...
+
+## Impacts/Proposed Changes
+* 
+
+## Outcome/how to judge success
+* 
+* shift works?
+
+
+
+
+
+
