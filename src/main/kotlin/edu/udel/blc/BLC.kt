@@ -1,6 +1,5 @@
 package edu.udel.blc
 
-import com.github.ajalt.clikt.completion.completionOption
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.context
 import com.github.ajalt.clikt.output.CliktHelpFormatter
@@ -10,10 +9,7 @@ import com.github.ajalt.clikt.parameters.groups.groupChoice
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.file
-import edu.udel.blc.ast.CompilationUnitNode
-import edu.udel.blc.ast.ExpressionNode
 import edu.udel.blc.ast.Node
-import edu.udel.blc.ast.StatementNode
 import edu.udel.blc.ast.opt.Optimizer
 import edu.udel.blc.machine_code.MachineCode
 import edu.udel.blc.machine_code.bytecode.BytecodeGenerator
@@ -23,6 +19,11 @@ import edu.udel.blc.semantic_analysis.SemanticAnalysis
 import edu.udel.blc.util.LineMap
 import edu.udel.blc.util.TreeFormatter
 import java.io.File
+import java.util.logging.ConsoleHandler
+import java.util.logging.Handler
+import java.util.logging.Level
+import java.util.logging.Logger
+
 
 class BLC : CliktCommand() {
 
@@ -42,12 +43,16 @@ class BLC : CliktCommand() {
         "bytecode" to BytecodeGenerator(),
     ).defaultByName("bytecode")
 
+
     //TODO: some how config optimizer
 //    private val optimizer by option("-O", "--Optimize").groupChoice(
 //        "0" to Optimizer(),
 //        "1" to Optimizer(),
 //    ).defaultByName("optimize")
-    private val optimize by option("--optimize", help = "optimize ?")
+    private val optimize by option("--optimize", help = "optimize the code")
+        .flag(default = false, defaultForHelp = "false")
+
+    private val verbose by option("--verbose", help = "print verbose info for debugging")
         .flag(default = false, defaultForHelp = "false")
 
     private val printAst by option("--print-ast", help = "Print the abstract syntax tree")
@@ -72,6 +77,13 @@ class BLC : CliktCommand() {
     }
 
     override fun run() {
+        if (verbose) { // logging
+            val logHandler: Handler = ConsoleHandler()
+            val log: Logger = Logger.getLogger("global")
+            log.level = Level.ALL
+            logHandler.setLevel(Level.ALL);
+            log.addHandler(logHandler)
+        }
 
         val source = input.readText()
 

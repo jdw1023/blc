@@ -18,7 +18,7 @@ class Optimizer : ValuedVisitor<Node, Node>() {
      */
 
     companion object {
-        val LOG = Logger.getLogger(Optimizer::class.java.name) // TODO: set logger level in command line
+         val LOG = Logger.getLogger("global") // TODO: set logger level in command line
     }
 
 
@@ -72,13 +72,13 @@ class Optimizer : ValuedVisitor<Node, Node>() {
 
         val newNode = when { // TODO: code refactoring
             (opd is IntLiteralNode && opr == UnaryOperator.NEGATION) -> {
-                LOG.info("(Constant folding) ${opr} ${opd.value} ")
+                LOG.fine("(Constant folding) ${opr} ${opd.value} ")
                 IntLiteralNode(node.range, -opd.value)
             }
             (opd is BooleanLiteralNode) -> {
                 when (opr) {
                     (UnaryOperator.LOGICAL_COMPLEMENT) -> {
-                        LOG.info("(Constant folding) ${opr} ${opd.value} ")
+                        LOG.fine("(Constant folding) ${opr} ${opd.value} ")
                         BooleanLiteralNode(node.range, !opd.value)
                     }
                     else -> {
@@ -162,7 +162,7 @@ class Optimizer : ValuedVisitor<Node, Node>() {
 
         // TODO: does blc support short circuit?
         if (newcondition is BooleanLiteralNode) { // deadcode elimination
-            LOG.info(" deadcode elimiation for if condition ${newcondition} ")
+            LOG.fine(" deadcode elimiation for if condition ${newcondition} ")
             if (newcondition.value) {
                 return this.apply(node.thenStatement)
             } else {
@@ -203,7 +203,7 @@ class Optimizer : ValuedVisitor<Node, Node>() {
      *******************/
 
     private fun constFoldBinExpressInt(node: BinaryExpressionNode, l: IntLiteralNode, r: IntLiteralNode): Node {
-        LOG.info("(Constant folding) ${l.value} ${node.operator} ${r.value} ")
+        LOG.fine("(Constant folding) ${l.value} ${node.operator} ${r.value} ")
         val newNode = when (node.operator) {  // TODO: figure out what's the range, range chr in source?
             BinaryOperator.ADDITION -> IntLiteralNode(node.range, l.value + r.value)
             BinaryOperator.SUBTRACTION -> IntLiteralNode(node.range, l.value - r.value)
@@ -226,7 +226,7 @@ class Optimizer : ValuedVisitor<Node, Node>() {
         l: BooleanLiteralNode,
         r: BooleanLiteralNode
     ): Node {
-        LOG.info("(Constant folding) ${l.value} ${node.operator} ${r.value} ")
+        LOG.fine("(Constant folding) ${l.value} ${node.operator} ${r.value} ")
         val newNode = when (node.operator) {
             BinaryOperator.EQUAL_TO -> BooleanLiteralNode(node.range, l.value == r.value)
             BinaryOperator.NOT_EQUAL_TO -> BooleanLiteralNode(node.range, l.value != r.value)
