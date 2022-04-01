@@ -162,8 +162,24 @@ class Optimizer : ValuedVisitor<Node, Node>() {
 
         private fun `if`(node: IfNode): Node {
                 val newcondition = this.apply(node.condition) as ExpressionNode
-                //val newstatements
-                return IfNode(node.range, newcondition, node.thenStatement, node.elseStatement)
+                LOG.info("${newcondition}")
+                if (newcondition is BooleanLiteralNode) { // short circuit?
+                        if (newcondition.value) {
+                                return this.apply(node.thenStatement)
+                        } else {
+                                // TODO!!
+                                // since else is optional in if, we need to check if it is null
+                                // What should we return if else is null?
+                                // return null?
+                                // return empty expression?
+                                // Note: elseStatement has the type `StatementNode?`, see question mark usage
+                                // in https://kotlinlang.org/docs/null-safety.html
+                                if(node.elseStatement != null) { 
+                                        return this.apply(node.elseStatement)
+                                }
+                        }
+                }
+                return IfNode(node.range, newcondition, node.thenStatement, node.elseStatement) // fallback
         }
 
         private fun expressionStatement(node: ExpressionStatementNode): Node {
