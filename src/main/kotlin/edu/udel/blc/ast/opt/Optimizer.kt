@@ -8,7 +8,7 @@ class Optimizer : ValuedVisitor<Node, Node>() {
 
     /**
     TODO:
-     * Constant Folding
+     * ~~Constant Folding~~
      * Strength Reduction
      * Deadcode Elimination
 
@@ -159,8 +159,10 @@ class Optimizer : ValuedVisitor<Node, Node>() {
 
     private fun `if`(node: IfNode): Node {
         val newcondition = this.apply(node.condition) as ExpressionNode
-        LOG.info("${newcondition}")
-        if (newcondition is BooleanLiteralNode) { // short circuit?
+
+        // TODO: does blc support short circuit?
+        if (newcondition is BooleanLiteralNode) { // deadcode elimination
+            LOG.info(" deadcode elimiation for if condition ${newcondition} ")
             if (newcondition.value) {
                 return this.apply(node.thenStatement)
             } else {
@@ -169,6 +171,7 @@ class Optimizer : ValuedVisitor<Node, Node>() {
                 // What should we return if else is null?
                 // return null?
                 // return empty expression?
+                // how can/do we remove the if
                 // Note: elseStatement has the type `StatementNode?`, see question mark usage
                 // in https://kotlinlang.org/docs/null-safety.html
                 if (node.elseStatement != null) {
@@ -205,15 +208,9 @@ class Optimizer : ValuedVisitor<Node, Node>() {
             BinaryOperator.ADDITION -> IntLiteralNode(node.range, l.value + r.value)
             BinaryOperator.SUBTRACTION -> IntLiteralNode(node.range, l.value - r.value)
             BinaryOperator.MULTIPLICATION -> IntLiteralNode(node.range, l.value * r.value)
-            BinaryOperator.REMAINDER -> IntLiteralNode(
-                node.range,
-                l.value % r.value
-            ) // what's the operation for division?
-
-            BinaryOperator.EQUAL_TO -> BooleanLiteralNode(
-                node.range,
-                l.value == r.value
-            ) // what's the operation for division?
+            BinaryOperator.REMAINDER -> IntLiteralNode(node.range, l.value % r.value)
+            // what's the operation for division?
+            BinaryOperator.EQUAL_TO -> BooleanLiteralNode(node.range, l.value == r.value)
             BinaryOperator.NOT_EQUAL_TO -> BooleanLiteralNode(node.range, l.value != r.value)
             BinaryOperator.GREATER_THAN -> BooleanLiteralNode(node.range, l.value > r.value)
             BinaryOperator.GREATER_THAN_OR_EQUAL_TO -> BooleanLiteralNode(node.range, l.value >= r.value)
