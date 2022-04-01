@@ -27,8 +27,9 @@ class Optimizer : ValuedVisitor<Node, Node>() {
          */
 
         companion object {
-                val LOG = Logger.getLogger(Optimizer::class.java.name)
+                val LOG = Logger.getLogger(Optimizer::class.java.name) // TODO: set logger level in command line
         }
+        
 
         init {
                 register(FunctionDeclarationNode::class.java, ::functionDeclaration)
@@ -55,6 +56,15 @@ class Optimizer : ValuedVisitor<Node, Node>() {
                 register(ReferenceNode::class.java, ::reference)
                 register(UnaryExpressionNode::class.java, ::unaryExpression)
 
+//                register(CompilationUnitNode::class.java, ::compilationUnit)
+
+        }
+
+        public fun optimize(node: CompilationUnitNode): CompilationUnitNode {
+                val newStatements = buildList() {
+                        node.statements.forEach { add( apply(it) as StatementNode) }
+                }
+                return CompilationUnitNode(node.range, newStatements)
         }
 
         private fun index(node: IndexNode): Node {

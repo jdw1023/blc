@@ -88,11 +88,7 @@ class BLC : CliktCommand() {
             if (optimize) {
                 val optimizer = Optimizer()
 
-//                compilationUnit.statements.forEach { print(optimizer.apply(it)) }
-                val newStatements = buildList() {
-                    compilationUnit.statements.forEach { add(optimizer.apply(it) as StatementNode) } // TODO: refactor this to opt directory?
-                }
-                compilationUnit = CompilationUnitNode(compilationUnit.range, newStatements)
+                compilationUnit = optimizer.optimize(compilationUnit)
             }
 
             if (printAst) {
