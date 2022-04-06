@@ -1,0 +1,6 @@
+struct Person { age: Int, name: String }
+
+var p1:Person = Person(45, "Joe");
+
+print(p1.age);
+print(p1.name);

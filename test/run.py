@@ -18,11 +18,12 @@ class bcolors:
 # TODO: better testing using some framework (junit?)
 OPTIONS = ' '.join(argv[1:]) if len(argv) >1 else '' # add blc options here
 COLOR = True
-for filename in glob.iglob('**/*.bl', root_dir='test', recursive=True):
-     print(f'./build/install/blc/bin/blc {OPTIONS} {filename}')
-     output = run(f'../build/install/blc/bin/blc {OPTIONS} {filename}', shell=True, cwd='test', stdout=PIPE, stderr=STDOUT)
-     output_text = output.stdout
-     if output.returncode != 0 and COLOR:
-          print(f'{bcolors.WARNING}{output_text.decode()}{bcolors.ENDC}', end='')
-     else:
+for filename in glob.iglob('test/*/*.bl', recursive=True):
+    filename = filename[5:]
+    print(f'./build/install/blc/bin/blc {OPTIONS} {filename}')
+    output = run(f'../build/install/blc/bin/blc {OPTIONS} {filename}', shell=True, cwd='test', stdout=PIPE, stderr=STDOUT)
+    output_text = output.stdout
+    if output.returncode != 0 and COLOR:
+         print(f'{bcolors.WARNING}{output_text.decode()}{bcolors.ENDC}', end='')
+    else:
          print(output_text.decode())
