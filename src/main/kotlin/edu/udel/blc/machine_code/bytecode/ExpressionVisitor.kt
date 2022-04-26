@@ -119,10 +119,18 @@ class ExpressionVisitor(
 
     private fun binaryExpression(node: BinaryExpressionNode) {
         when (node.operator) {
+	    /**
+	    TODO: Put the real operator registers in this block, with appropriate helper functions:
+	    */
             BinaryOperator.ADDITION -> binaryMath(node, ADD)
             BinaryOperator.SUBTRACTION -> binaryMath(node, SUB)
             BinaryOperator.MULTIPLICATION -> binaryMath(node, MUL)
             BinaryOperator.REMAINDER -> binaryMath(node, REM)
+	    BinaryOperator.DIVISION -> binaryMath(node, DIV)
+	    BinaryOperator.BITWISE_XOR -> binaryMath(node, XOR)
+	    BinaryOperator.SHIFT_LEFT -> binaryMath(node, SHL)
+	    BinaryOperator.SHIFT_RIGHT_ALGO -> binaryMath(node, SHR)
+	    BinaryOperator.SHIFT_RIGHT_LOGIC -> binaryMath(node, USHR)
             BinaryOperator.EQUAL_TO -> equality(node, EQ)
             BinaryOperator.NOT_EQUAL_TO -> equality(node, NE)
             BinaryOperator.GREATER_THAN -> comparison(node, GT)
@@ -131,6 +139,7 @@ class ExpressionVisitor(
             BinaryOperator.LESS_THAN_OR_EQUAL_TO -> comparison(node, LE)
             BinaryOperator.LOGICAL_CONJUNCTION -> binaryLogic(node, EQ)
             BinaryOperator.LOGICAL_DISJUNCTION -> binaryLogic(node, NE)
+
         }
     }
 
