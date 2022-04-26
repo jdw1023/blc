@@ -15,6 +15,8 @@ data class BaseToken(
         DOT,
 
         PLUS, MINUS, SLASH, STAR, PERCENT,
+	CARET,
+	DBLANGLE, DBRANGLE, TPRANGLE,
         COLON, SEMICOLON,
         BANG,
 
