@@ -1,6 +1,8 @@
 package edu.udel.blc.ast.opt
 
 import edu.udel.blc.ast.*
+import edu.udel.blc.semantic_analysis.scope.Scope
+import edu.udel.blc.util.uranium.Reactor
 import edu.udel.blc.util.visitor.ValuedVisitor
 import java.util.logging.Logger
 
@@ -10,7 +12,8 @@ class Optimizer : ValuedVisitor<Node, Node>() {
     TODO:
      * ~~Constant Folding~~
      * Strength Reduction
-     * Deadcode Elimination
+     * ~~Deadcode Elimination~~
+     * Constant Propagation
 
     Use ValuedVisitor to walk tree and return new AST node tree
 
@@ -18,11 +21,14 @@ class Optimizer : ValuedVisitor<Node, Node>() {
      */
 
     companion object {
-         val LOG = Logger.getLogger("global") // TODO: set logger level in command line
+        val LOG = Logger.getLogger("global") // TODO: set logger level in command line
     }
-
+    
+    val variables:MutableMap<String, ExpressionNode>
+    private lateinit var symboltable: Reactor
 
     init {
+        this.variables = mutableMapOf<String, ExpressionNode>() // hacky solution, might not work; TODO: use check scope? 
         register(FunctionDeclarationNode::class.java, ::functionDeclaration)
         register(VariableDeclarationNode::class.java, ::variableDeclaration)
 
@@ -51,7 +57,9 @@ class Optimizer : ValuedVisitor<Node, Node>() {
 
     }
 
-    fun optimize(node: CompilationUnitNode): CompilationUnitNode {
+    fun optimize(node: CompilationUnitNode, symboltable: Reactor): CompilationUnitNode {
+        this.symboltable = symboltable
+
         val newStatements = buildList {
             node.statements.forEach { add(apply(it) as StatementNode) }
         }
@@ -130,6 +138,14 @@ class Optimizer : ValuedVisitor<Node, Node>() {
     }
 
     private fun assignment(node: AssignmentNode): Node {
+        println("assignment")
+        println(node)
+        println(symboltable.get<Scope>(node, "scope"))
+        println("---")
+        if(node.lvalue is ReferenceNode) {
+            LOG.fine(" variable ${node.lvalue.name} reassigned (not constant)")
+            variables.remove(node.lvalue.name)
+        }
         return node
     }
 
@@ -138,6 +154,7 @@ class Optimizer : ValuedVisitor<Node, Node>() {
     }
 
     private fun intLiteral(node: IntLiteralNode): Node {
+        println("emm")
         return node
     }
 
@@ -187,14 +204,33 @@ class Optimizer : ValuedVisitor<Node, Node>() {
     }
 
     private fun block(node: BlockNode): Node {
-        return node
+
+        val newStatements = buildList {
+            node.statements.forEach { add(apply(it) as StatementNode) }
+        }
+        val newnode = BlockNode(node.range, newStatements)
+        return newnode
     }
 
     private fun variableDeclaration(node: VariableDeclarationNode): Node {
+        variables.put(node.name, node.initializer)
+        println("variableDeclaration")
+        println(node.name)
+        println(symboltable.get<Scope>(node, "scope"))
+
+        println(node.initializer)
+        println(symboltable.get<Scope>(node.initializer, "scope"))
+        println("---")
+
+        //println(node.name)
+        //println(node.initializer)
         return node
     }
 
     fun functionDeclaration(node: FunctionDeclarationNode): Node {
+        val newnode = FunctionDeclarationNode(node.range, node.name, node.parameters, node.returnType,
+            apply(node.body) as BlockNode
+        )
         return node
     }
 
