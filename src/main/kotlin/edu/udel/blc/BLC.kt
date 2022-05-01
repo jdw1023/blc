@@ -100,8 +100,8 @@ class BLC : CliktCommand() {
             if (optimize) {
                 val optimizer = Optimizer()
                 compilationUnit = optimizer.optimize(compilationUnit, symboltable)
-                for (key in optimizer.variables.keys) {
-                    println("${key} = ${optimizer.variables[key]}")
+                for (variable in optimizer.variables) {
+                    println("${variable}")
                 }
 
             }

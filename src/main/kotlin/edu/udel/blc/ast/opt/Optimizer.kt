@@ -2,6 +2,7 @@ package edu.udel.blc.ast.opt
 
 import edu.udel.blc.ast.*
 import edu.udel.blc.semantic_analysis.scope.Scope
+import edu.udel.blc.semantic_analysis.scope.Symbol
 import edu.udel.blc.util.uranium.Reactor
 import edu.udel.blc.util.visitor.ValuedVisitor
 import java.util.logging.Logger
@@ -24,11 +25,11 @@ class Optimizer : ValuedVisitor<Node, Node>() {
         val LOG = Logger.getLogger("global") // TODO: set logger level in command line
     }
     
-    val variables:MutableMap<String, ExpressionNode>
+    val variables:MutableList<Variable>
     private lateinit var symboltable: Reactor
 
     init {
-        this.variables = mutableMapOf<String, ExpressionNode>() // hacky solution, might not work; TODO: use check scope? 
+        this.variables = mutableListOf<Variable>() // hacky solution, might not work; TODO: use check scope?
         register(FunctionDeclarationNode::class.java, ::functionDeclaration)
         register(VariableDeclarationNode::class.java, ::variableDeclaration)
 
@@ -138,13 +139,20 @@ class Optimizer : ValuedVisitor<Node, Node>() {
     }
 
     private fun assignment(node: AssignmentNode): Node {
-        println("assignment")
-        println(node)
-        println(symboltable.get<Scope>(node, "scope"))
-        println("---")
-        if(node.lvalue is ReferenceNode) {
-            LOG.fine(" variable ${node.lvalue.name} reassigned (not constant)")
-            variables.remove(node.lvalue.name)
+//        println("assignment")
+//        println(node)
+//        println(symboltable.get<Scope>(node.lvalue, "scope"))
+//        println(symboltable.get<Symbol>(node.lvalue, "symbol"))
+//        println("---")
+        val scope = symboltable.get<Scope>(node.lvalue, "scope")
+        val name = symboltable.get<Symbol>(node.lvalue, "symbol").name
+        if(node.lvalue is ReferenceNode && variables.contains(Variable(name, scope))) {
+            LOG.fine(" variable ${node.lvalue.name} in ${scope} reassigned (not constant)")
+//            println(node.lvalue.name)
+//            println(symboltable.get<Scope>(node.lvalue, "scope"))
+//            println(symboltable.get<Symbol>(node.lvalue, "symbol"))
+//            println(symboltable.get<Symbol>(node.lvalue, "symbol").name)
+//            println(symboltable.get<Symbol>(node.lvalue, "symbol").containingScope)
         }
         return node
     }
@@ -154,7 +162,6 @@ class Optimizer : ValuedVisitor<Node, Node>() {
     }
 
     private fun intLiteral(node: IntLiteralNode): Node {
-        println("emm")
         return node
     }
 
@@ -213,14 +220,30 @@ class Optimizer : ValuedVisitor<Node, Node>() {
     }
 
     private fun variableDeclaration(node: VariableDeclarationNode): Node {
-        variables.put(node.name, node.initializer)
-        println("variableDeclaration")
-        println(node.name)
-        println(symboltable.get<Scope>(node, "scope"))
+        if(node.type is ReferenceNode){
+            val name = node.name //symboltable.get<Symbol>(node.type, "symbol").name
+            val scope = symboltable.get<Symbol>(node, "symbol").containingScope
 
-        println(node.initializer)
-        println(symboltable.get<Scope>(node.initializer, "scope"))
-        println("---")
+
+            variables.add(Variable(name,scope))
+//            println(node.name)
+//            println(symboltable.get<Scope>(node.type, "scope"))
+//            println(symboltable.get<Symbol>(node.type, "symbol"))
+//            println(symboltable.get<Symbol>(node.type, "symbol").name)
+//            println(symboltable.get<Symbol>(node.type, "symbol").containingScope)
+        }
+//        println("variableDeclaration")
+//        println(node.name)
+//        println(node.type)
+//        println("===")
+//
+//        println(symboltable.get<Symbol>(node.type, "symbol"))
+//
+//        println(node.initializer)
+//        println(symboltable.get<Scope>(node.initializer, "scope"))
+//        println("---")
+
+
 
         //println(node.name)
         //println(node.initializer)
