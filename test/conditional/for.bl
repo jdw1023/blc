@@ -1,0 +1,5 @@
+//Tests for Loops
+
+for(var x: Int = 0; x>10; x = x+1){
+print(x);
+}
