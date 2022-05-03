@@ -25,11 +25,11 @@ class Optimizer : ValuedVisitor<Node, Node>() {
         val LOG = Logger.getLogger("global") // TODO: set logger level in command line
     }
     
-    val variables:MutableList<Variable>
+    val variables:MutableList<Symbol>
     private lateinit var symboltable: Reactor
 
     init {
-        this.variables = mutableListOf<Variable>() // hacky solution, might not work; TODO: use check scope?
+        this.variables = mutableListOf<Symbol>() // hacky solution, might not work; TODO: use check scope?
         register(FunctionDeclarationNode::class.java, ::functionDeclaration)
         register(VariableDeclarationNode::class.java, ::variableDeclaration)
 
@@ -139,20 +139,19 @@ class Optimizer : ValuedVisitor<Node, Node>() {
     }
 
     private fun assignment(node: AssignmentNode): Node {
-//        println("assignment")
-//        println(node)
-//        println(symboltable.get<Scope>(node.lvalue, "scope"))
-//        println(symboltable.get<Symbol>(node.lvalue, "symbol"))
-//        println("---")
-        val scope = symboltable.get<Scope>(node.lvalue, "scope")
-        val name = symboltable.get<Symbol>(node.lvalue, "symbol").name
-        if(node.lvalue is ReferenceNode && variables.contains(Variable(name, scope))) {
-            LOG.fine(" variable ${node.lvalue.name} in ${scope} reassigned (not constant)")
+//        if(node.lvalue is ReferenceNode) {
+//            println("assignment")
 //            println(node.lvalue.name)
 //            println(symboltable.get<Scope>(node.lvalue, "scope"))
 //            println(symboltable.get<Symbol>(node.lvalue, "symbol"))
 //            println(symboltable.get<Symbol>(node.lvalue, "symbol").name)
 //            println(symboltable.get<Symbol>(node.lvalue, "symbol").containingScope)
+//            println("---")
+//        }
+        val symbol = symboltable.get<Symbol>(node.lvalue, "symbol")
+//        if(node.lvalue is ReferenceNode && variables.contains(Variable(name, scope))) {
+        if(node.lvalue is ReferenceNode && variables.contains(symbol)) {
+            LOG.fine(" variable ${node.lvalue.name} in ${symbol.containingScope} reassigned (not constant)")
         }
         return node
     }
@@ -221,32 +220,22 @@ class Optimizer : ValuedVisitor<Node, Node>() {
 
     private fun variableDeclaration(node: VariableDeclarationNode): Node {
         if(node.type is ReferenceNode){
-            val name = node.name //symboltable.get<Symbol>(node.type, "symbol").name
-            val scope = symboltable.get<Symbol>(node, "symbol").containingScope
+            val symbol = symboltable.get<Symbol>(node, "symbol")
 
-
-            variables.add(Variable(name,scope))
+            variables.add(symbol)
+//            variables.add(Variable(name,scope))
+//            println("variableDeclaration")
 //            println(node.name)
+//            println(symboltable.get<Scope>(node, "scope"))
+//            println(symboltable.get<Symbol>(node, "symbol"))
+//            println(symboltable.get<Symbol>(node, "symbol").name)
+//            println(symboltable.get<Symbol>(node, "symbol").containingScope)
 //            println(symboltable.get<Scope>(node.type, "scope"))
 //            println(symboltable.get<Symbol>(node.type, "symbol"))
 //            println(symboltable.get<Symbol>(node.type, "symbol").name)
 //            println(symboltable.get<Symbol>(node.type, "symbol").containingScope)
+//            println("---")
         }
-//        println("variableDeclaration")
-//        println(node.name)
-//        println(node.type)
-//        println("===")
-//
-//        println(symboltable.get<Symbol>(node.type, "symbol"))
-//
-//        println(node.initializer)
-//        println(symboltable.get<Scope>(node.initializer, "scope"))
-//        println("---")
-
-
-
-        //println(node.name)
-        //println(node.initializer)
         return node
     }
 
