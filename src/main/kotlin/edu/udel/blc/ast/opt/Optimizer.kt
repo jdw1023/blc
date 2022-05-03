@@ -25,11 +25,11 @@ class Optimizer : ValuedVisitor<Node, Node>() {
         val LOG = Logger.getLogger("global") // TODO: set logger level in command line
     }
     
-    val variables:MutableList<Symbol>
+    val variables:MutableMap<Symbol, Node>
     private lateinit var symboltable: Reactor
 
     init {
-        this.variables = mutableListOf<Symbol>() // hacky solution, might not work; TODO: use check scope?
+        this.variables = mutableMapOf<Symbol, Node>()
         register(FunctionDeclarationNode::class.java, ::functionDeclaration)
         register(VariableDeclarationNode::class.java, ::variableDeclaration)
 
@@ -152,6 +152,7 @@ class Optimizer : ValuedVisitor<Node, Node>() {
 //        if(node.lvalue is ReferenceNode && variables.contains(Variable(name, scope))) {
         if(node.lvalue is ReferenceNode && variables.contains(symbol)) {
             LOG.fine(" variable ${node.lvalue.name} in ${symbol.containingScope} reassigned (not constant)")
+            variables.remove(symbol)
         }
         return node
     }
@@ -222,7 +223,9 @@ class Optimizer : ValuedVisitor<Node, Node>() {
         if(node.type is ReferenceNode){
             val symbol = symboltable.get<Symbol>(node, "symbol")
 
-            variables.add(symbol)
+            if(node.initializer is IntLiteralNode || node.initializer is BooleanLiteralNode || node.initializer is StringLiteralNode) {
+                variables.set(symbol, node.initializer)
+            }
 //            variables.add(Variable(name,scope))
 //            println("variableDeclaration")
 //            println(node.name)
