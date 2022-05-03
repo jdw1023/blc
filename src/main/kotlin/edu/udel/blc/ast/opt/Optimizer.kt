@@ -95,18 +95,17 @@ class Optimizer : ValuedVisitor<Node, Node>() {
 
     private fun optConstReference(node: Node): Node {
         if (node !is ReferenceNode) return node
-        println("ref!!!")
         if (passes == 0) return node
         val symbol = symboltable.get<Symbol>(node, "symbol")
         var returnValue: Node? = null
         if(passes % 2 == 0) {
             if(variables1.contains(symbol)) {
-                println(variables1.get(symbol))
+                LOG.fine("optimize constant references: ${variables1.get(symbol)}")
                 returnValue = variables1.get(symbol)
             }
         }else{
             if(variables2.contains(symbol)) {
-                println(variables1.get(symbol))
+                LOG.fine("optimize constant references: ${variables2.get(symbol)}")
                 returnValue = variables2.get(symbol)
             }
         }
