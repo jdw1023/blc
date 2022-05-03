@@ -61,7 +61,15 @@ class Optimizer : ValuedVisitor<Node, Node>() {
 
     }
 
-    fun optimize(node: CompilationUnitNode, symboltable: Reactor): CompilationUnitNode {
+    /**
+     * take a CompilationUnitNode optimize based on the symboltable and the number of pass
+     *
+     * @param node the CompilationUnitNode
+     * @param symboltable
+     * @param numpass number of pass
+     * @return a optimized CompilationUnitNode
+     */
+    fun optimize(node: CompilationUnitNode, symboltable: Reactor, numpass: Int): CompilationUnitNode {
         this.symboltable = symboltable
 
         var newStatements = buildList {
@@ -71,7 +79,7 @@ class Optimizer : ValuedVisitor<Node, Node>() {
         //Set the number of passes using a (optional) cli argument.
 
         // now the variables is filled with constant variables
-        for (i in 1..20) {
+        for (i in 1..numpass) {
             passes += 1
             newStatements = buildList { // do optimization again
                 newStatements.forEach { add(apply(it) as StatementNode) }
