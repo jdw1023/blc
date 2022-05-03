@@ -58,7 +58,7 @@ class BLC : CliktCommand() {
     private val output by option("-o", "--output", help = "Location to store binary")
         .file(mustBeWritable = true, mustExist = false)
         
-    private val numpass:Int by option("--optimize-passes", help = "number of passes for the optimizer. [1..100]").int().restrictTo(1..100).default(1)
+    private val numpass:Int by option("--optimize-passes", help = "number of passes for the optimizer. [1..100]").int().restrictTo(0..100).default(1)
 
     private fun onSuccess(codeGenerationResult: MachineCode) {
         val outFile = output ?: File("${input.nameWithoutExtension}.${target.extension}")
