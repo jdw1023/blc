@@ -226,6 +226,7 @@ class Optimizer : ValuedVisitor<Node, Node>() {
         return node
     }
 
+    // TODO: fix failing constant propogation 2 test
     private fun `while`(node: WhileNode): Node {
         return node
     }
