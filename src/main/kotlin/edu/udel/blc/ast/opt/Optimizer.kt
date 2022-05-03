@@ -25,11 +25,14 @@ class Optimizer : ValuedVisitor<Node, Node>() {
         val LOG = Logger.getLogger("global") // TODO: set logger level in command line
     }
     
-    val variables:MutableMap<Symbol, Node>
+    val variables1:MutableMap<Symbol, Node>
+    val variables2:MutableMap<Symbol, Node>
+    private var passes = 0;
     private lateinit var symboltable: Reactor
 
     init {
-        this.variables = mutableMapOf<Symbol, Node>()
+        this.variables1 = mutableMapOf<Symbol, Node>()
+        this.variables2 = mutableMapOf<Symbol, Node>()
         register(FunctionDeclarationNode::class.java, ::functionDeclaration)
         register(VariableDeclarationNode::class.java, ::variableDeclaration)
 
@@ -61,8 +64,21 @@ class Optimizer : ValuedVisitor<Node, Node>() {
     fun optimize(node: CompilationUnitNode, symboltable: Reactor): CompilationUnitNode {
         this.symboltable = symboltable
 
-        val newStatements = buildList {
+        var newStatements = buildList {
             node.statements.forEach { add(apply(it) as StatementNode) }
+        }
+        // now the variables is filled with constant variables
+        passes += 1
+        newStatements = buildList { // do optimization again
+            newStatements.forEach { add(apply(it) as StatementNode) }
+        }
+        passes += 1
+        newStatements = buildList { // do optimization again
+            newStatements.forEach { add(apply(it) as StatementNode) }
+        }
+        passes += 1
+        newStatements = buildList { // do optimization again
+            newStatements.forEach { add(apply(it) as StatementNode) }
         }
         return CompilationUnitNode(node.range, newStatements)
     }
@@ -75,9 +91,30 @@ class Optimizer : ValuedVisitor<Node, Node>() {
         return node
     }
 
+    private fun optConstReference(node: Node): Node {
+        if (node !is ReferenceNode) return node
+        println("ref!!!")
+        if (passes == 0) return node
+        val symbol = symboltable.get<Symbol>(node, "symbol")
+        var returnValue: Node? = null
+        if(passes % 2 == 0) {
+            if(variables1.contains(symbol)) {
+                println(variables1.get(symbol))
+                returnValue = variables1.get(symbol)
+            }
+        }else{
+            if(variables2.contains(symbol)) {
+                println(variables1.get(symbol))
+                returnValue = variables2.get(symbol)
+            }
+        }
+        if(returnValue != null) return returnValue
+        return node
+    }
+
     private fun unaryExpression(node: UnaryExpressionNode): Node { //
         val opr = node.operator
-        val opd = this.apply(node.operand) // resolve operand
+        val opd = optConstReference(this.apply(node.operand)) // resolve operand
 
         val newNode = when { // TODO: code refactoring
             (opd is IntLiteralNode && opr == UnaryOperator.NEGATION) -> {
@@ -94,7 +131,6 @@ class Optimizer : ValuedVisitor<Node, Node>() {
                         node
                     }
                 }
-
             }
             else -> {
                 node
@@ -125,8 +161,9 @@ class Optimizer : ValuedVisitor<Node, Node>() {
     }
 
     private fun binaryExpression(node: BinaryExpressionNode): Node {
-        val l = this.apply(node.left)
-        val r = this.apply(node.right)
+        val l = optConstReference(this.apply(node.left))
+        val r = optConstReference(this.apply(node.right))
+
         val newNode = when {
             //(l is IntLiteralNode && r is IntLiteralNode) ->
             (l is IntLiteralNode && r is IntLiteralNode) -> constFoldBinExpressInt(node, l, r)
@@ -149,11 +186,18 @@ class Optimizer : ValuedVisitor<Node, Node>() {
 //            println("---")
 //        }
         val symbol = symboltable.get<Symbol>(node.lvalue, "symbol")
-//        if(node.lvalue is ReferenceNode && variables.contains(Variable(name, scope))) {
-        if(node.lvalue is ReferenceNode && variables.contains(symbol)) {
-            LOG.fine(" variable ${node.lvalue.name} in ${symbol.containingScope} reassigned (not constant)")
-            variables.remove(symbol)
+        if(passes % 2 == 1) {
+            if(node.lvalue is ReferenceNode && variables1.contains(symbol)) {
+                LOG.fine(" variable ${node.lvalue.name} in ${symbol.containingScope} reassigned (not constant)")
+                variables1.remove(symbol)
+            }
+        }else{
+            if(node.lvalue is ReferenceNode && variables2.contains(symbol)) {
+                LOG.fine(" variable ${node.lvalue.name} in ${symbol.containingScope} reassigned (not constant)")
+                variables2.remove(symbol)
+            }
         }
+
         return node
     }
 
@@ -211,7 +255,6 @@ class Optimizer : ValuedVisitor<Node, Node>() {
     }
 
     private fun block(node: BlockNode): Node {
-
         val newStatements = buildList {
             node.statements.forEach { add(apply(it) as StatementNode) }
         }
@@ -222,9 +265,12 @@ class Optimizer : ValuedVisitor<Node, Node>() {
     private fun variableDeclaration(node: VariableDeclarationNode): Node {
         if(node.type is ReferenceNode){
             val symbol = symboltable.get<Symbol>(node, "symbol")
-
-            if(node.initializer is IntLiteralNode || node.initializer is BooleanLiteralNode || node.initializer is StringLiteralNode) {
-                variables.set(symbol, node.initializer)
+            if (node.initializer is IntLiteralNode || node.initializer is BooleanLiteralNode || node.initializer is StringLiteralNode) {
+                if(passes % 2 == 1) {
+                    variables1.set(symbol, node.initializer)
+                }else{
+                    variables2.set(symbol, node.initializer)
+                }
             }
 //            variables.add(Variable(name,scope))
 //            println("variableDeclaration")
@@ -243,10 +289,10 @@ class Optimizer : ValuedVisitor<Node, Node>() {
     }
 
     fun functionDeclaration(node: FunctionDeclarationNode): Node {
-        val newnode = FunctionDeclarationNode(node.range, node.name, node.parameters, node.returnType,
-            apply(node.body) as BlockNode
-        )
-        return node
+        val newBody = apply(node.body) as BlockNode
+//        val newnode = FunctionDeclarationNode(node.range, node.name, node.parameters, node.returnType, node.body)
+        node.body = newBody
+        return node // TODO investigate issue with newnode
     }
 
     /********************
