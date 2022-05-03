@@ -67,6 +67,9 @@ class Optimizer : ValuedVisitor<Node, Node>() {
         var newStatements = buildList {
             node.statements.forEach { add(apply(it) as StatementNode) }
         }
+        //TODO: Refactor
+        //Set the number of passes using a (optional) cli argument.
+
         // now the variables is filled with constant variables
         passes += 1
         newStatements = buildList { // do optimization again
