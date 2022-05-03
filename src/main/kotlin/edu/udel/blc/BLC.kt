@@ -43,12 +43,6 @@ class BLC : CliktCommand() {
         "bytecode" to BytecodeGenerator(),
     ).defaultByName("bytecode")
 
-
-    //TODO: some how config optimizer
-//    private val optimizer by option("-O", "--Optimize").groupChoice(
-//        "0" to Optimizer(),
-//        "1" to Optimizer(),
-//    ).defaultByName("optimize")
     private val optimize by option("--optimize", help = "optimize the code")
         .flag(default = false, defaultForHelp = "false")
 
@@ -81,7 +75,7 @@ class BLC : CliktCommand() {
             val logHandler: Handler = ConsoleHandler()
             val log: Logger = Logger.getLogger("global")
             log.level = Level.ALL
-            logHandler.setLevel(Level.ALL);
+            logHandler.level = Level.ALL
             log.addHandler(logHandler)
         }
 
@@ -89,21 +83,14 @@ class BLC : CliktCommand() {
 
         val result = binding {
             var compilationUnit = parser.apply(source).bind()
-
-//            if (printAst) {
-//                TreeFormatter.appendTo(System.out, compilationUnit, Node::class.java)
-//            }
-
             val symboltable = SemanticAnalysis.apply(compilationUnit).bind()
 
-            // TODO: Add Optimizer code here w/ command flag
             if (optimize) {
                 val optimizer = Optimizer()
                 compilationUnit = optimizer.optimize(compilationUnit, symboltable)
                 for (variable in optimizer.variables) {
                     println("${variable}")
                 }
-
             }
 
             if (printAst) {
@@ -117,7 +104,6 @@ class BLC : CliktCommand() {
             .onSuccess(::onSuccess)
             .onFailure(::reportErrors)
     }
-
 }
 
 
