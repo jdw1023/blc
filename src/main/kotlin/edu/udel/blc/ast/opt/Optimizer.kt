@@ -71,17 +71,16 @@ class Optimizer : ValuedVisitor<Node, Node>() {
         //Set the number of passes using a (optional) cli argument.
 
         // now the variables is filled with constant variables
-        passes += 1
-        newStatements = buildList { // do optimization again
-            newStatements.forEach { add(apply(it) as StatementNode) }
-        }
-        passes += 1
-        newStatements = buildList { // do optimization again
-            newStatements.forEach { add(apply(it) as StatementNode) }
-        }
-        passes += 1
-        newStatements = buildList { // do optimization again
-            newStatements.forEach { add(apply(it) as StatementNode) }
+        for (i in 1..20) {
+            passes += 1
+            newStatements = buildList { // do optimization again
+                newStatements.forEach { add(apply(it) as StatementNode) }
+            }
+            if(passes % 2 == 0) {
+                variables1.clear()
+            }else{
+                variables2.clear()
+            }
         }
         return CompilationUnitNode(node.range, newStatements)
     }
@@ -266,6 +265,8 @@ class Optimizer : ValuedVisitor<Node, Node>() {
     }
 
     private fun variableDeclaration(node: VariableDeclarationNode): Node {
+        val newInitializer = optConstReference(apply(node.initializer)) as ExpressionNode
+        node.initializer = newInitializer
         if(node.type is ReferenceNode){
             val symbol = symboltable.get<Symbol>(node, "symbol")
             if (node.initializer is IntLiteralNode || node.initializer is BooleanLiteralNode || node.initializer is StringLiteralNode) {
@@ -288,6 +289,7 @@ class Optimizer : ValuedVisitor<Node, Node>() {
 //            println(symboltable.get<Symbol>(node.type, "symbol").containingScope)
 //            println("---")
         }
+
         return node
     }
 
