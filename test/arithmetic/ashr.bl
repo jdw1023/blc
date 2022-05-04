@@ -1,0 +1,7 @@
+print("Checking shifts");
+print("These should be true: ");
+print(-8>>1==-4);
+print(-1>>1==-1);
+
+print("These shoould be false: ");
+print(-2>>0==-1);
