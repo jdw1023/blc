@@ -1,3 +1,4 @@
+print("Checking XOR");
 print("These should be true: ");
 print( 5^234542309^5 == 234542309 );
 print( 0^0 == 0 );
