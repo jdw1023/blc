@@ -128,9 +128,9 @@ class ExpressionVisitor(
             BinaryOperator.REMAINDER -> binaryMath(node, REM)
 	    BinaryOperator.DIVISION -> binaryMath(node, DIV)
 	    BinaryOperator.BITWISE_XOR -> binaryMath(node, XOR)
-	    BinaryOperator.SHIFT_LEFT -> binaryMath(node, SHL)
-	    BinaryOperator.SHIFT_RIGHT_ALGO -> binaryMath(node, SHR)
-	    BinaryOperator.SHIFT_RIGHT_LOGIC -> binaryMath(node, USHR)
+	    BinaryOperator.SHIFT_LEFT -> binaryMathShift(node, SHL)
+	    BinaryOperator.SHIFT_RIGHT_ALGO -> binaryMathShift(node, SHR)
+	    BinaryOperator.SHIFT_RIGHT_LOGIC -> binaryMathShift(node, USHR)
             BinaryOperator.EQUAL_TO -> equality(node, EQ)
             BinaryOperator.NOT_EQUAL_TO -> equality(node, NE)
             BinaryOperator.GREATER_THAN -> comparison(node, GT)
@@ -150,6 +150,16 @@ class ExpressionVisitor(
         method.unbox(LONG_TYPE)
         method.math(operator, LONG_TYPE)
         method.box(LONG_TYPE)
+    }
+
+    // Modified binaryMath operator so that the types are correct:
+    private fun binaryMathShift(node: BinaryExpressionNode, operator: Int){
+    	accept(node.left)
+	method.unbox(LONG_TYPE)
+	accept(node.right)
+	method.unbox(INT_TYPE)
+	method.math(operator, LONG_TYPE)
+	method.box(LONG_TYPE)
     }
 
     private fun equality(node: BinaryExpressionNode, mode: Int) {
