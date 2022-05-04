@@ -108,12 +108,12 @@ class Optimizer : ValuedVisitor<Node, Node>() {
         var returnValue: Node? = null
         if(passes % 2 == 0) {
             if(variables1.contains(symbol)) {
-                LOG.fine("optimize constant references: ${variables1.get(symbol)}")
+                LOG.fine("optimize constant references: ${variables1.get(symbol)} ${symbol} ${symbol.containingScope}")
                 returnValue = variables1.get(symbol)
             }
         }else{
             if(variables2.contains(symbol)) {
-                LOG.fine("optimize constant references: ${variables2.get(symbol)}")
+                LOG.fine("optimize constant references: ${variables2.get(symbol)} ${symbol} ${symbol.containingScope}")
                 returnValue = variables2.get(symbol)
             }
         }
