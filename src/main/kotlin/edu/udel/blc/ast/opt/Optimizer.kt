@@ -228,7 +228,8 @@ class Optimizer : ValuedVisitor<Node, Node>() {
 
     // TODO: fix failing constant propogation 2 test
     private fun `while`(node: WhileNode): Node {
-        return node
+        val newnode = WhileNode(node.range,node.condition,apply(node.body) as StatementNode)
+        return newnode
     }
 
     private fun `return`(node: ReturnNode): Node {
