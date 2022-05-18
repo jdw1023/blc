@@ -10,7 +10,7 @@ class Optimizer : ValuedVisitor<Node, Node>() {
     TODO:
      * ~~Constant Folding~~
      * Strength Reduction
-     * Deadcode Elimination
+     * ~~Deadcode Elimination~~
 
     Use ValuedVisitor to walk tree and return new AST node tree
 
