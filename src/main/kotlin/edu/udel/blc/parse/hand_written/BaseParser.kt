@@ -181,7 +181,7 @@ class BaseParser(
     fun switchStatement(): SwitchNode{
         val keyword = consume(SWITCH) { "Expect 'switch'."}
         consume(LPAREN) { "Expect '('."}
-        val target = identifier()
+        val target = consume(IDENTIFIER) { "expected IDENTIFIER" }
         consume(RPAREN) { "Expect ')'."}
         val lbrace = consume(LBRACE) { "Expect '{'." }
         val cases = buildList {
@@ -189,7 +189,7 @@ class BaseParser(
                 val casenode = consume(CASE) { "Expect 'case '."}
                 val option = expression()
                 val body = statement()
-                val case = BinaryExpressionNode(option.range, EQUAL_TO, target, option)
+                val case = BinaryExpressionNode(option.range, EQUAL_TO, ReferenceNode(target.range, target.text), option)
                 //this += CaseNode(casenode.range, case,body)
                 this += IfNode(casenode.range, case, body, null)
             }
