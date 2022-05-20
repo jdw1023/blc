@@ -33,6 +33,7 @@ class CheckTypes(
         register(AssignmentNode::class.java, PRE_VISIT, ::assignment)
         register(IfNode::class.java, PRE_VISIT, ::ifStmt)
         register(WhileNode::class.java, PRE_VISIT, ::whileStmt)
+        register(ForNode::class.java, PRE_VISIT, ::forStmt)
         register(ReturnNode::class.java, PRE_VISIT, ::returnStmt)
     }
 
@@ -204,6 +205,11 @@ class CheckTypes(
     private fun whileStmt(node: WhileNode) {
         checkType("check condition for while", node.condition, BooleanType)
     }
+
+    private fun forStmt(node: ForNode){
+        checkType("check condition for for", node.condition, BooleanType)
+    }
+
 
     private fun returnStmt(node: ReturnNode) {
         reactor.on(

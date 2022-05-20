@@ -1,5 +1,6 @@
 package edu.udel.blc.parse.hand_written
 
+
 import edu.udel.blc.ast.*
 import edu.udel.blc.ast.BinaryOperator.*
 import edu.udel.blc.ast.UnaryOperator.LOGICAL_COMPLEMENT
@@ -92,7 +93,7 @@ class BaseParser(
         consume(COLON) { "Expect ':' after variable name." }
         val type = type()
         consume(EQUAL) { "Expect '=' before initializer." }
-        val initializer = expression()
+        val initializer = expression(case1)
         consume(SEMICOLON) { "Expect ';' after variable declaration." }
         return VariableDeclarationNode(name.range, name.text, type, initializer)
     }
@@ -104,6 +105,8 @@ class BaseParser(
             check(RETURN) -> returnStatement()
             check(WHILE) -> whileStatement()
             check(LBRACE) -> block()
+            check(FOR) -> forStatement()
+            check(SWITCH) -> switchStatement()
             else -> expressionStatement()
         }
     }
@@ -120,15 +123,19 @@ class BaseParser(
     }
 
     fun expressionStatement(): StatementNode {
-        val expr = expression()
-        consume(SEMICOLON) { "Expect ';' after statement." }
+        val expr = expression(case1)
+        if (check(SEMICOLON)) {
+            consume(SEMICOLON) { "Expect ';' after statement." }
+        }else {
+            consume(RPAREN) { "Expect ')' after statement" }
+        }
         return ExpressionStatementNode(expr.range, expr)
     }
 
     fun ifStatement(): StatementNode {
         val keyword = consume(IF) { "Expect 'if'." }
         consume(LPAREN) { "Expect '(' after 'if'." }
-        val condition = expression()
+        val condition = expression(case1)
         consume(RPAREN) { "Expect ')' after if condition." }
         val thenStatement = statement()
         val elseStatement = when {
@@ -142,7 +149,7 @@ class BaseParser(
         val keyword = consume(RETURN) { "Expect 'return'." }
         val value = when {
             check(SEMICOLON) -> null
-            else -> expression()
+            else -> expression(case1)
         }
         consume(SEMICOLON) { "Expect ';' after return." }
         return ReturnNode(keyword.range, value)
@@ -151,12 +158,60 @@ class BaseParser(
     fun whileStatement(): StatementNode {
         val keyword = consume(WHILE) { "Expect 'while'." }
         consume(LPAREN) { "Expect '(' after 'while'." }
-        val condition = expression()
+        val condition = expression(case1)
         consume(RPAREN) { "Expect ')' after condition." }
         val body = statement()
         return WhileNode(keyword.range, condition, body)
     }
 
+    fun forStatement(): ForNode {
+        val keyword = consume(FOR) { "Expect 'for '."}
+        consume(LPAREN) { "Expect '(' after' for'."}
+        val variable = declaration()
+        val condition = expression(case1)
+        consume(SEMICOLON) { "Expect ';' after condition"}
+        //increment or decrement (statement node)
+        val modifier = statement()
+        //body of for statement (statement node)
+        val body = statement()
+
+        return ForNode(keyword.range, variable, condition, modifier, body)
+    }
+
+    fun switchStatement(): SwitchNode{
+        val keyword = consume(SWITCH) { "Expect 'switch'."}
+        consume(LPAREN) { "Expect '('."}
+        val target = identifier()
+        consume(RPAREN) { "Expect ')'."}
+        val lbrace = consume(LBRACE) { "Expect '{'." }
+        val cases = buildList {
+            while (!check(DEFAULT) && check(CASE)) {
+                val casenode = consume(CASE) { "Expect 'case '."}
+                val option = expression()
+                val body = statement()
+                val case = BinaryExpressionNode(option.range, EQUAL_TO, target, option)
+                //this += CaseNode(casenode.range, case,body)
+                this += IfNode(casenode.range, case, body, null)
+            }
+        }
+        val default = defaultStatement()
+        consume(RBRACE) { "Expect '}'." }
+        return SwitchNode(keyword.range, cases, default)
+    }
+/*
+    fun casestatement(): CaseNode{
+        val keyword = consume(CASE) {"Expect 'case '."}
+        val option = identifier()
+        val body = statement()
+        val case = BinaryExpressionNode(keyword.range, EQUAL_TO, target, option)
+        return CaseNode(keyword.range, case, body)
+    }
+*/
+    fun defaultStatement(): DefaultNode{
+        val keyword = consume(DEFAULT) {"Expect 'default '."}
+        val body = statement()
+        return DefaultNode(keyword.range, body)
+    }
 
     fun expression(): ExpressionNode {
         return assignment()
@@ -322,7 +377,7 @@ class BaseParser(
                 }
                 check(LBRACKET) -> {
                     val lbracket = consume(LBRACKET) { "Expect '['." }
-                    val index = expression()
+                    val index = expression(case1)
                     consume(RBRACKET) { "Expect ']' after index." }
                     IndexNode(lbracket.range, expr, index)
                 }
@@ -380,7 +435,7 @@ class BaseParser(
 
     fun parenthesizedExpression(): ExpressionNode {
         val lparen = consume(LPAREN) { "Expect '('." }
-        val expr = expression()
+        val expr = expression(case1)
         consume(RPAREN) { "Expect ')'." }
         return expr
     }

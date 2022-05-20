@@ -38,6 +38,9 @@ class ResolveReferences(
 
         register(ReturnNode::class.java, PRE_VISIT, ::returnStmt)
 
+       // register(SwitchNode::class.java, PRE_VISIT, ::enterswitchnode)
+       // register(SwitchNode::class.java, POST_VISIT, ::exitswitchnode)
+
         registerFallback(PRE_VISIT, ::enterNode)
     }
 
@@ -52,7 +55,20 @@ class ResolveReferences(
         val globalScope = GlobalScope(scope)
         scope = globalScope
     }
+/*
+    private fun enterswitchnode(node: SwitchNode){
+        reactor[node, "scope"] = scope
+        val localScope = LocalScope(scope)
 
+      //  scope = localScope
+        val globalScope = GlobalScope(scope)
+        scope = scope.containingScope!!
+
+    }
+    private fun exitswitchnode(node: SwitchNode){
+        scope = scope.containingScope!!
+    }
+*/
     private fun exitCompilationUnit(node: CompilationUnitNode) {
         scope = scope.containingScope!!
     }

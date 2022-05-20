@@ -1,4 +1,7 @@
 package edu.udel.blc.ast
 
-class DefaultNode {
-}
+
+class DefaultNode (
+    range: IntRange,
+    val body: StatementNode,
+) : StatementNode(range)

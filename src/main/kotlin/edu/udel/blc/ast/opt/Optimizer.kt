@@ -32,6 +32,8 @@ class Optimizer : ValuedVisitor<Node, Node>() {
         register(IfNode::class.java, ::`if`)
         register(ReturnNode::class.java, ::`return`)
         register(WhileNode::class.java, ::`while`)
+        register(ForNode::class.java, ::`for`)
+        register(SwitchNode::class.java, ::`switch`)
 
         register(ArrayLiteralNode::class.java, ::arrayLiteral)
         register(BooleanLiteralNode::class.java, ::booleanLiteral)
@@ -150,6 +152,14 @@ class Optimizer : ValuedVisitor<Node, Node>() {
     }
 
     private fun `while`(node: WhileNode): Node {
+        return node
+    }
+
+    private fun `for`(node: ForNode): Node {
+        return node
+    }
+
+    private fun `switch`(node: SwitchNode): Node {
         return node
     }
 
