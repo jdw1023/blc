@@ -9,7 +9,7 @@ print(3-3==0);
 print(-9-3==-12);
 
 print("These should be false: ");
-print(x-y==2);
-print(x-3==3);
-print(3-x==-3);
+print(x-y==20);
+print(x-3==30);
+print(3-x==-32);
 print(3-9==-3);

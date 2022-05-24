@@ -18,13 +18,16 @@ class CompilationUnitTranslator(
 
     override fun apply(node: CompilationUnitNode): Bytecode {
 
+	// Scans the file for Struct Definition Nodes and generates the bytecode for them
         val structs = StructTranslator(reactor).apply(node)
 
+	// Generates a Main class with all the code of the given file put into it
         val mainclass = buildClass(
             access = ACC_PUBLIC,
             name = compilationUnitName
         ) { clazz ->
 
+	    // Generate the built-in functions and insert them at the beginning of the bytecode
             generateBuiltins(clazz)
 
             // main
@@ -43,7 +46,8 @@ class CompilationUnitTranslator(
     }
 
     private fun generateBuiltins(clazz: ClassWriter) {
-
+	
+	// public static int len(ArrayList)
         clazz.buildMethod(
             access = ACC_PUBLIC or ACC_STATIC,
             method = "Long len(java.util.ArrayList)"
@@ -54,7 +58,8 @@ class CompilationUnitTranslator(
             method.box(LONG_TYPE)
             method.returnValue()
         }
-
+	
+	// public static String str(Object)
         clazz.buildMethod(
             access = ACC_PUBLIC or ACC_STATIC,
             method = "String str(Object)"
@@ -65,6 +70,7 @@ class CompilationUnitTranslator(
             method.returnValue()
         }
 
+	// public static void print(Object)
         clazz.buildMethod(
             access = ACC_PUBLIC or ACC_STATIC,
             method = "Void print(Object)"
@@ -77,6 +83,7 @@ class CompilationUnitTranslator(
             method.returnValue()
         }
 
+	// public static String concat(String, String)
         clazz.buildMethod(
             access = ACC_PUBLIC or ACC_STATIC,
             method = "String concat(String, String)"

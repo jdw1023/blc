@@ -21,6 +21,7 @@ class BytecodeGenerator : MachineCodeGenerator("Bytecode Generator") {
 
     override fun apply(reactor: Reactor, compilationUnit: CompilationUnitNode): Result<MachineCode> {
 
+	// Start the Bytecode Generation Pipeline
         val result = CompilationUnitTranslator(mainClassName, reactor).apply(compilationUnit)
 
         if (run) {

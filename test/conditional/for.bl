@@ -1,0 +1,13 @@
+//Tests for Loops
+
+for(var x: Int = 15; x>10; x = x-1){
+print("true");
+}
+
+for(var x: Int = 1; x<1; x = x+1){
+print("donkey");
+}
+
+
+
+

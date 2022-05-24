@@ -21,6 +21,7 @@ class StructTranslator(
     override fun apply(compilationUnit: CompilationUnitNode): List<ClassFileObject> =
         compilationUnit.find<StructDeclarationNode>().map { translate(it) }
 
+    // Translate each StructDeclarationNode as a Class definition
     private fun translate(node: StructDeclarationNode): ClassFileObject {
         val structSymbol = reactor.get<StructSymbol>(node, "symbol")
         val structType = reactor.get<StructType>(structSymbol, "type")

@@ -1,7 +1,9 @@
 package edu.udel.blc.ast
 
-class WhileNode(
+class ForNode(
     range: IntRange,
+    val variable: StatementNode,
     val condition: ExpressionNode,
+    val modifier: StatementNode,
     val body: StatementNode,
 ) : StatementNode(range)

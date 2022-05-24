@@ -39,6 +39,9 @@ class StatementVisitor(
         register(IfNode::class.java, ::`if`)
         register(ReturnNode::class.java, ::`return`)
         register(WhileNode::class.java, ::`while`)
+        register(ForNode::class.java, ::`for`)
+        register(SwitchNode::class.java, ::`switch`)
+        register(DefaultNode::class.java, ::defaultNode)
 
     }
 
@@ -126,6 +129,44 @@ class StatementVisitor(
         accept(node.body)
         method.goTo(startLabel)
         method.mark(endLabel)
+    }
+
+    fun `for`(node: ForNode) {
+        val startLabel = method.newLabel()
+        val endLabel = method.newLabel()
+        accept(node.variable)
+        method.mark(startLabel)
+        expressionVisitor.accept(node.condition)
+        method.unbox(BOOLEAN_TYPE)
+        method.ifZCmp(EQ, endLabel)
+        accept(node.body)
+        accept(node.modifier)
+        method.goTo(startLabel)
+        method.mark(endLabel)
+    }
+
+    fun `switch`(node: SwitchNode) {
+        val startLabel = method.newLabel()
+
+        val default = true
+        //expressionVisitor.accept(node.target)
+        method.mark(startLabel)
+        node.cases.forEach {
+            val endLabel = method.newLabel()
+            expressionVisitor.accept(it.condition)
+            method.unbox(BOOLEAN_TYPE)
+            method.ifZCmp(EQ, endLabel)
+            accept(it.thenStatement)
+//            val default = false
+            method.mark(endLabel)
+        }
+        if (default){
+            accept(node.default)
+        }
+    }
+
+    fun defaultNode(node: DefaultNode) {
+        accept(node.body)
     }
 
 

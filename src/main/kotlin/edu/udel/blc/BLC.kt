@@ -10,6 +10,7 @@ import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.file
 import edu.udel.blc.ast.Node
+import edu.udel.blc.ast.opt.Optimizer
 import edu.udel.blc.machine_code.MachineCode
 import edu.udel.blc.machine_code.bytecode.BytecodeGenerator
 import edu.udel.blc.parse.antlr.AntlrBasedParser
@@ -18,6 +19,11 @@ import edu.udel.blc.semantic_analysis.SemanticAnalysis
 import edu.udel.blc.util.LineMap
 import edu.udel.blc.util.TreeFormatter
 import java.io.File
+import java.util.logging.ConsoleHandler
+import java.util.logging.Handler
+import java.util.logging.Level
+import java.util.logging.Logger
+
 
 class BLC : CliktCommand() {
 
@@ -36,6 +42,18 @@ class BLC : CliktCommand() {
     private val target by option("-t", "--target").groupChoice(
         "bytecode" to BytecodeGenerator(),
     ).defaultByName("bytecode")
+
+
+    //TODO: some how config optimizer
+//    private val optimizer by option("-O", "--Optimize").groupChoice(
+//        "0" to Optimizer(),
+//        "1" to Optimizer(),
+//    ).defaultByName("optimize")
+    private val optimize by option("--optimize", help = "optimize the code")
+        .flag(default = false, defaultForHelp = "false")
+
+    private val verbose by option("--verbose", help = "print verbose info for debugging")
+        .flag(default = false, defaultForHelp = "false")
 
     private val printAst by option("--print-ast", help = "Print the abstract syntax tree")
         .flag(default = false, defaultForHelp = "false")
@@ -59,19 +77,35 @@ class BLC : CliktCommand() {
     }
 
     override fun run() {
+        if (verbose) { // logging
+            val logHandler: Handler = ConsoleHandler()
+            val log: Logger = Logger.getLogger("global")
+            log.level = Level.ALL
+            logHandler.setLevel(Level.ALL);
+            log.addHandler(logHandler)
+        }
 
         val source = input.readText()
 
         val result = binding {
-            val compilationUnit = parser.apply(source).bind()
+            var compilationUnit = parser.apply(source).bind()
 
-            if (printAst) {
-                TreeFormatter.appendTo(System.out, compilationUnit, Node::class.java)
-            }
+//            if (printAst) {
+//                TreeFormatter.appendTo(System.out, compilationUnit, Node::class.java)
+//            }
 
             val symboltable = SemanticAnalysis.apply(compilationUnit).bind()
 
             // TODO: Add Optimizer code here w/ command flag
+            if (optimize) {
+                val optimizer = Optimizer()
+
+                compilationUnit = optimizer.optimize(compilationUnit)
+            }
+
+            if (printAst) {
+                TreeFormatter.appendTo(System.out, compilationUnit, Node::class.java)
+            }
 
             target.apply(symboltable, compilationUnit).bind()
         }
