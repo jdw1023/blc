@@ -1,0 +1,17 @@
+print("Checking division");
+print("These should be true: ");
+print(537/3==179);
+print(100/4==25);
+print(101/4==25);
+print(-1/1==-1);
+print(1/-1==-1);
+print(-1/-1==1);
+print(1/1==1);
+
+print("These should be false: ");
+print(9/5==2);
+print(19/5==4);
+print(-1/-1==-1);
+
+print("This should throw a JVM ArithmeticException for Divide by Zero: ");
+print(1/0);

@@ -1,0 +1,11 @@
+print("Checking XOR");
+print("These should be true: ");
+print( 5^234542309^5 == 234542309 );
+print( 0^0 == 0 );
+print( 1^1 == 0 );
+print( 0^1 == 1 );
+print( -1^0 == -1 );
+print( -1^-1 == 0 );
+print("These should be false: ");
+print( 5^5^5 == 0);
+print( -1 ^ 1 == 0);
