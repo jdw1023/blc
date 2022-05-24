@@ -1,21 +1,34 @@
 //Tests for switchstatements
+print("these should all print true");
 var x: Int = 3;
 switch (x) {
     case (1){
-        print(1);
+        print("False");
     }
     case (2){
-        print(2);
+        print("False");
     }
     case (3){
-        print(3);
+        print("True");
     }
     case (4){
-        print(4);
+        print("False");
     }
     default{
-        print("default");
+        print("True");
     }
 }
 
+var y: Int = 2;
 
+switch (y) {
+    case(1){
+        print("False");
+    }
+    case(4){
+        print("False");
+    }
+    default{
+        print("True");
+    }
+}
