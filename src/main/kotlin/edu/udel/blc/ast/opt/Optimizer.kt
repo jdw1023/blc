@@ -14,7 +14,6 @@ class Optimizer : ValuedVisitor<Node, Node>() {
      * ~~Constant Folding~~
      * Strength Reduction
      * ~~Deadcode Elimination~~
-     * Constant Propagation
 
     Use ValuedVisitor to walk tree and return new AST node tree
 
