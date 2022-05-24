@@ -41,3 +41,4 @@
 
 # test build
 test/*.jar
+*.jar

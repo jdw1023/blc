@@ -22,9 +22,9 @@ object SemanticAnalysis : Function<CompilationUnitNode, Result<Reactor>> {
             .andThen(CheckReturns(reactor))
             .accept(compilationUnit)
 
-//        for((attribute, value) in SymbolTable.attributes) {
-//            println("$attribute : $value")
-//        }
+        //for((attribute, value) in reactor.attributeValues) {
+        //    println("$attribute =  $value")
+        //}
 
         val errors = reactor.errors()
         return when {

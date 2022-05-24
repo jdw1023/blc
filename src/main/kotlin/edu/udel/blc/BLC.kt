@@ -6,9 +6,12 @@ import com.github.ajalt.clikt.output.CliktHelpFormatter
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.groups.defaultByName
 import com.github.ajalt.clikt.parameters.groups.groupChoice
+import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.file
+import com.github.ajalt.clikt.parameters.types.int
+import com.github.ajalt.clikt.parameters.types.restrictTo
 import edu.udel.blc.ast.Node
 import edu.udel.blc.ast.opt.Optimizer
 import edu.udel.blc.machine_code.MachineCode
@@ -43,12 +46,6 @@ class BLC : CliktCommand() {
         "bytecode" to BytecodeGenerator(),
     ).defaultByName("bytecode")
 
-
-    //TODO: some how config optimizer
-//    private val optimizer by option("-O", "--Optimize").groupChoice(
-//        "0" to Optimizer(),
-//        "1" to Optimizer(),
-//    ).defaultByName("optimize")
     private val optimize by option("--optimize", help = "optimize the code")
         .flag(default = false, defaultForHelp = "false")
 
@@ -60,7 +57,8 @@ class BLC : CliktCommand() {
 
     private val output by option("-o", "--output", help = "Location to store binary")
         .file(mustBeWritable = true, mustExist = false)
-
+        
+    private val numpass:Int by option("--optimize-passes", help = "number of passes for the optimizer. [1..100]").int().restrictTo(0..100).default(1)
 
     private fun onSuccess(codeGenerationResult: MachineCode) {
         val outFile = output ?: File("${input.nameWithoutExtension}.${target.extension}")
@@ -81,7 +79,7 @@ class BLC : CliktCommand() {
             val logHandler: Handler = ConsoleHandler()
             val log: Logger = Logger.getLogger("global")
             log.level = Level.ALL
-            logHandler.setLevel(Level.ALL);
+            logHandler.level = Level.ALL
             log.addHandler(logHandler)
         }
 
@@ -89,18 +87,11 @@ class BLC : CliktCommand() {
 
         val result = binding {
             var compilationUnit = parser.apply(source).bind()
-
-//            if (printAst) {
-//                TreeFormatter.appendTo(System.out, compilationUnit, Node::class.java)
-//            }
-
             val symboltable = SemanticAnalysis.apply(compilationUnit).bind()
 
-            // TODO: Add Optimizer code here w/ command flag
             if (optimize) {
                 val optimizer = Optimizer()
-
-                compilationUnit = optimizer.optimize(compilationUnit)
+                compilationUnit = optimizer.optimize(compilationUnit, symboltable, numpass)
             }
 
             if (printAst) {
@@ -114,7 +105,6 @@ class BLC : CliktCommand() {
             .onSuccess(::onSuccess)
             .onFailure(::reportErrors)
     }
-
 }
 
 

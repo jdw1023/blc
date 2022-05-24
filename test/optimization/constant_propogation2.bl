@@ -1,0 +1,11 @@
+var i:Int = 20;
+var a:Int = 0;
+print(a);
+while(i!=0){
+    a=a+1;
+    i=i-1;
+    print(a);
+}
+var c:Int = a;
+print(a);
+print(c);
