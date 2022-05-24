@@ -5,7 +5,14 @@ enum class BinaryOperator {
     ADDITION,
     SUBTRACTION,
     MULTIPLICATION,
+    DIVISION,
     REMAINDER,
+
+    BITWISE_XOR,
+
+    SHIFT_LEFT,
+    SHIFT_RIGHT_ALGO,
+    SHIFT_RIGHT_LOGIC,
 
     EQUAL_TO,
     NOT_EQUAL_TO,
@@ -22,7 +29,14 @@ enum class BinaryOperator {
         ADDITION -> "+"
         SUBTRACTION -> "-"
         MULTIPLICATION -> "*"
+	DIVISION -> "/"
         REMAINDER -> "%"
+
+	BITWISE_XOR -> "^"
+
+	SHIFT_LEFT -> "<<"
+	SHIFT_RIGHT_ALGO -> ">>"
+	SHIFT_RIGHT_LOGIC -> ">>>"
 
         EQUAL_TO -> "=="
         NOT_EQUAL_TO -> "!="

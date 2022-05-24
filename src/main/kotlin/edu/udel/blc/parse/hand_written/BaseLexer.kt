@@ -76,6 +76,7 @@ class BaseLexer(
             '+' == c -> PLUS
             '*' == c -> STAR
             '%' == c -> PERCENT
+	    '^' == c -> CARET
             ';' == c -> SEMICOLON
             '&' == c -> when {
                 match('&') -> AND
@@ -95,10 +96,15 @@ class BaseLexer(
             }
             '<' == c -> when {
                 match('=') -> LANGLE_EQUAL
+		match('<') -> DBLANGLE
                 else -> LANGLE
             }
             '>' == c -> when {
                 match('=') -> RANGLE_EQUAL
+		match('>') -> when{
+			match('>') -> TPRANGLE
+			else -> DBRANGLE
+		}
                 else -> RANGLE
             }
             '/' == c -> when {

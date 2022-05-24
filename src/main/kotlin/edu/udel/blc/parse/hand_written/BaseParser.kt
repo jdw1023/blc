@@ -286,6 +286,32 @@ class BaseParser(
                     val right = factor()
                     BinaryExpressionNode(operator.range, MULTIPLICATION, expr, right)
                 }
+		check(SLASH) -> {
+		    val operator = consume(SLASH) { "Expect '/'." }
+		    val right = factor()
+		    BinaryExpressionNode(operator.range, DIVISION, expr, right)
+		}
+		// TODO: Move these declarations to a helper for better order of operations:
+		check(CARET) -> {
+		    val operator = consume(CARET) {"Expect '^'."}
+		    val right = factor()
+		    BinaryExpressionNode(operator.range, BITWISE_XOR, expr, right)
+		}
+		check(DBLANGLE) -> {
+		    val operator = consume(DBLANGLE) {"Expect '<<'."}
+		    val right = factor()
+		    BinaryExpressionNode(operator.range, SHIFT_LEFT, expr, right)
+		}
+		check(DBRANGLE) -> {
+		    val operator = consume(DBRANGLE) {"Expect '>>'."}
+		    val right = factor()
+		    BinaryExpressionNode(operator.range, SHIFT_RIGHT_ALGO, expr, right)
+		}
+		check(TPRANGLE) -> {
+		    val operator = consume(TPRANGLE) {"Expect '>>>'."}
+		    val right = factor()
+		    BinaryExpressionNode(operator.range, SHIFT_RIGHT_LOGIC, expr, right)
+		}
                 else -> break
             }
         }
