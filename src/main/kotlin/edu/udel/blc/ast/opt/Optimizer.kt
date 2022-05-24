@@ -1,6 +1,9 @@
 package edu.udel.blc.ast.opt
 
 import edu.udel.blc.ast.*
+import edu.udel.blc.semantic_analysis.scope.Scope
+import edu.udel.blc.semantic_analysis.scope.Symbol
+import edu.udel.blc.util.uranium.Reactor
 import edu.udel.blc.util.visitor.ValuedVisitor
 import java.util.logging.Logger
 
@@ -18,11 +21,17 @@ class Optimizer : ValuedVisitor<Node, Node>() {
      */
 
     companion object {
-         val LOG = Logger.getLogger("global") // TODO: set logger level in command line
+        val LOG = Logger.getLogger("global") // TODO: set logger level in command line
     }
-
+    
+    val variables1:MutableMap<Symbol, Node>
+    val variables2:MutableMap<Symbol, Node>
+    private var passes = 0;
+    private lateinit var symboltable: Reactor
 
     init {
+        this.variables1 = mutableMapOf<Symbol, Node>()
+        this.variables2 = mutableMapOf<Symbol, Node>()
         register(FunctionDeclarationNode::class.java, ::functionDeclaration)
         register(VariableDeclarationNode::class.java, ::variableDeclaration)
 
@@ -51,9 +60,34 @@ class Optimizer : ValuedVisitor<Node, Node>() {
 
     }
 
-    fun optimize(node: CompilationUnitNode): CompilationUnitNode {
-        val newStatements = buildList {
+    /**
+     * take a CompilationUnitNode optimize based on the symboltable and the number of pass
+     *
+     * @param node the CompilationUnitNode
+     * @param symboltable
+     * @param numpass number of pass
+     * @return a optimized CompilationUnitNode
+     */
+    fun optimize(node: CompilationUnitNode, symboltable: Reactor, numpass: Int): CompilationUnitNode {
+        this.symboltable = symboltable
+
+        var newStatements = buildList {
             node.statements.forEach { add(apply(it) as StatementNode) }
+        }
+        //TODO: Refactor
+        //Set the number of passes using a (optional) cli argument.
+
+        // now the variables is filled with constant variables
+        for (i in 1..numpass) {
+            passes += 1
+            newStatements = buildList { // do optimization again
+                newStatements.forEach { add(apply(it) as StatementNode) }
+            }
+            if(passes % 2 == 0) {
+                variables1.clear()
+            }else{
+                variables2.clear()
+            }
         }
         return CompilationUnitNode(node.range, newStatements)
     }
@@ -66,9 +100,29 @@ class Optimizer : ValuedVisitor<Node, Node>() {
         return node
     }
 
+    private fun optConstReference(node: Node): Node {
+        if (node !is ReferenceNode) return node
+        if (passes == 0) return node
+        val symbol = symboltable.get<Symbol>(node, "symbol")
+        var returnValue: Node? = null
+        if(passes % 2 == 0) {
+            if(variables1.contains(symbol)) {
+                LOG.fine("optimize constant references: ${variables1.get(symbol)} ${symbol} ${symbol.containingScope}")
+                returnValue = variables1.get(symbol)
+            }
+        }else{
+            if(variables2.contains(symbol)) {
+                LOG.fine("optimize constant references: ${variables2.get(symbol)} ${symbol} ${symbol.containingScope}")
+                returnValue = variables2.get(symbol)
+            }
+        }
+        if(returnValue != null) return returnValue
+        return node
+    }
+
     private fun unaryExpression(node: UnaryExpressionNode): Node { //
         val opr = node.operator
-        val opd = this.apply(node.operand) // resolve operand
+        val opd = optConstReference(this.apply(node.operand)) // resolve operand
 
         val newNode = when { // TODO: code refactoring
             (opd is IntLiteralNode && opr == UnaryOperator.NEGATION) -> {
@@ -85,7 +139,6 @@ class Optimizer : ValuedVisitor<Node, Node>() {
                         node
                     }
                 }
-
             }
             else -> {
                 node
@@ -116,8 +169,9 @@ class Optimizer : ValuedVisitor<Node, Node>() {
     }
 
     private fun binaryExpression(node: BinaryExpressionNode): Node {
-        val l = this.apply(node.left)
-        val r = this.apply(node.right)
+        val l = optConstReference(this.apply(node.left))
+        val r = optConstReference(this.apply(node.right))
+
         val newNode = when {
             //(l is IntLiteralNode && r is IntLiteralNode) ->
             (l is IntLiteralNode && r is IntLiteralNode) -> constFoldBinExpressInt(node, l, r)
@@ -130,6 +184,28 @@ class Optimizer : ValuedVisitor<Node, Node>() {
     }
 
     private fun assignment(node: AssignmentNode): Node {
+//        if(node.lvalue is ReferenceNode) {
+//            println("assignment")
+//            println(node.lvalue.name)
+//            println(symboltable.get<Scope>(node.lvalue, "scope"))
+//            println(symboltable.get<Symbol>(node.lvalue, "symbol"))
+//            println(symboltable.get<Symbol>(node.lvalue, "symbol").name)
+//            println(symboltable.get<Symbol>(node.lvalue, "symbol").containingScope)
+//            println("---")
+//        }
+        val symbol = symboltable.get<Symbol>(node.lvalue, "symbol")
+        if(passes % 2 == 1) {
+            if(node.lvalue is ReferenceNode && variables1.contains(symbol)) {
+                LOG.fine(" variable ${node.lvalue.name} in ${symbol.containingScope} reassigned (not constant)")
+                variables1.remove(symbol)
+            }
+        }else{
+            if(node.lvalue is ReferenceNode && variables2.contains(symbol)) {
+                LOG.fine(" variable ${node.lvalue.name} in ${symbol.containingScope} reassigned (not constant)")
+                variables2.remove(symbol)
+            }
+        }
+
         return node
     }
 
@@ -149,8 +225,10 @@ class Optimizer : ValuedVisitor<Node, Node>() {
         return node
     }
 
+    // TODO: fix failing constant propogation 2 test
     private fun `while`(node: WhileNode): Node {
-        return node
+        val newnode = WhileNode(node.range,node.condition,apply(node.body) as StatementNode)
+        return newnode
     }
 
     private fun `return`(node: ReturnNode): Node {
@@ -187,15 +265,47 @@ class Optimizer : ValuedVisitor<Node, Node>() {
     }
 
     private fun block(node: BlockNode): Node {
-        return node
+        val newStatements = buildList {
+            node.statements.forEach { add(apply(it) as StatementNode) }
+        }
+        val newnode = BlockNode(node.range, newStatements)
+        return newnode
     }
 
     private fun variableDeclaration(node: VariableDeclarationNode): Node {
+        val newInitializer = optConstReference(apply(node.initializer)) as ExpressionNode
+        node.initializer = newInitializer
+        if(node.type is ReferenceNode){
+            val symbol = symboltable.get<Symbol>(node, "symbol")
+            if (node.initializer is IntLiteralNode || node.initializer is BooleanLiteralNode || node.initializer is StringLiteralNode) {
+                if(passes % 2 == 1) {
+                    variables1.set(symbol, node.initializer)
+                }else{
+                    variables2.set(symbol, node.initializer)
+                }
+            }
+//            variables.add(Variable(name,scope))
+//            println("variableDeclaration")
+//            println(node.name)
+//            println(symboltable.get<Scope>(node, "scope"))
+//            println(symboltable.get<Symbol>(node, "symbol"))
+//            println(symboltable.get<Symbol>(node, "symbol").name)
+//            println(symboltable.get<Symbol>(node, "symbol").containingScope)
+//            println(symboltable.get<Scope>(node.type, "scope"))
+//            println(symboltable.get<Symbol>(node.type, "symbol"))
+//            println(symboltable.get<Symbol>(node.type, "symbol").name)
+//            println(symboltable.get<Symbol>(node.type, "symbol").containingScope)
+//            println("---")
+        }
+
         return node
     }
 
     fun functionDeclaration(node: FunctionDeclarationNode): Node {
-        return node
+        val newBody = apply(node.body) as BlockNode
+//        val newnode = FunctionDeclarationNode(node.range, node.name, node.parameters, node.returnType, node.body)
+        node.body = newBody
+        return node // TODO investigate issue with newnode
     }
 
     /********************

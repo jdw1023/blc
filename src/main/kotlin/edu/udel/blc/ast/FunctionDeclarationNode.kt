@@ -6,5 +6,5 @@ class FunctionDeclarationNode(
     val name: String,
     val parameters: List<ParameterNode>,
     val returnType: Node,
-    val body: BlockNode,
+    var body: BlockNode,
 ) : StatementNode(range)
