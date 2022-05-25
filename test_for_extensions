@@ -1,0 +1,9 @@
+test/conditional/for.bl
+test/conditional/switch.bl
+test/arithmetic/shl.bl
+test/arithmetic/shr.bl
+test/arithmetic/xor.bl
+test/arithmetic/div.bl
+test/arithmetic/ashr.bl
+test/optimization/constant_propogation1.bl
+test/optimization/constant_propogation2.bl
