@@ -1,3 +1,8 @@
 // Testing different limits
-var x:Int = 2147483647
-print(x)
+
+var x:Int = 2147483646;
+print(x);
+var y:Int = 2147483647;
+print(y);
+var z:Int = 2147483648;
+print(z);

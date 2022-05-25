@@ -3,8 +3,8 @@ print("These should be true: ");
 print(true);
 print(!false);
 print(!!true);
-var a : Bool = true;
-var b : Bool = false;
+var a : Boolean = true;
+var b : Boolean = false;
 print(!b);
 print(a);
 
